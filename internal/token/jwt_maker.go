@@ -2,6 +2,7 @@ package token
 
 import (
 	"time"
+	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -10,7 +11,6 @@ type JWTMaker struct {
 	secretKey string  // 密钥
 	iss       string  // 发行方
 }
-
 
 func NewJWTMaker(secretKey, iss string) Maker {
 	return &JWTMaker{secretKey: secretKey, iss: iss}
@@ -40,15 +40,16 @@ func (maker *JWTMaker) VerifyToken(accessToken string) (*Payload, error) {
 		return []byte(maker.secretKey), nil
 	}
 
-	token, err := jwt.ParseWithClaims(accessToken, &Payload{}, keyFunc)
+	payload := &Payload{}
+
+	_, err := jwt.ParseWithClaims(accessToken, payload, keyFunc)
 	if err != nil {
-		return nil, err  // 内容被篡改（签名和密钥对不上）、过期
+		if strings.HasPrefix(err.Error(), "token has invalid claims: token is expired") {
+			return nil,  ErrTokenExpiry   // 过期
+		}
+
+		return nil, err  // 内容被篡改; 例, 签名和密钥对不上...
 	}
 
-	payload, ok := token.Claims.(*Payload)
-	if !(ok && token.Valid) {
-		return nil, err  // 类型断言失败
-	}
-	
 	return payload, nil
 }

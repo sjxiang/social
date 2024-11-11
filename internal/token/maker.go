@@ -2,9 +2,13 @@ package token
 
 import (
 	"time"
+	"errors"
 
 	"github.com/golang-jwt/jwt/v5"
 )
+
+
+var ErrTokenExpiry = errors.New("token is expired")
 
 
 type Maker interface {
@@ -31,5 +35,5 @@ type Payload struct {
 
 
 	实现, 通过组合的方式
-	
+
  */
