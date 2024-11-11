@@ -14,11 +14,12 @@ import (
 	"github.com/go-chi/cors"
 	"go.uber.org/zap"
 
-	"github.com/sjxiang/social/internal/db"
-	"github.com/sjxiang/social/internal/ratelimiter"
-	"github.com/sjxiang/social/internal/mailer"
 	"github.com/sjxiang/social/internal/auth"
 	"github.com/sjxiang/social/internal/config"
+	"github.com/sjxiang/social/internal/db"
+	"github.com/sjxiang/social/internal/mailer"
+	"github.com/sjxiang/social/internal/ratelimiter"
+	"github.com/sjxiang/social/internal/token"
 )
 
 
@@ -29,6 +30,7 @@ type application struct {
 	rateLimiter   ratelimiter.Limiter
 	mailer        mailer.Mailer
 	authenticator auth.Authenticator
+	tokenMaker    token.Maker
 }
 
 

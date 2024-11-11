@@ -1,8 +1,15 @@
 package auth
 
-import "github.com/golang-jwt/jwt/v5"
+import (
+	"errors"
+	"time"
+)
+
+var (
+	ErrTokenExpiry = errors.New("token is expired")
+)
 
 type Authenticator interface {
-	GenerateToken(claims jwt.Claims) (string, error)
-	ValidateToken(token string) (*jwt.Token, error)
+	GenerateToken(userID int64, duration time.Duration) (string, error)
+	ValidateToken(AccessToken string) (int64, error)
 }

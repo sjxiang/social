@@ -7,7 +7,7 @@ import (
 	"github.com/sjxiang/social/internal/env"
 )
 
-func Load() (Config, error) {
+func LoadConf() (Config, error) {
 	
 	// 从当前目录下的 .env 文件中加载环境变量
 	if err := godotenv.Load(); err != nil {

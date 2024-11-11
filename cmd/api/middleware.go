@@ -92,3 +92,10 @@ func (app *application) AuthTokenMiddleware(next http.Handler) http.Handler {
 // 		})
 // 	}
 // }
+
+
+// 认证
+func Authenticate()
+
+// 授权
+func Authorize()

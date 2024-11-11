@@ -1,16 +1,5 @@
 package main
 
-// import (
-// 	"net/http"
-// 	"strconv"
-
-// 	"github.com/go-chi/chi/v5"
-// 	"github.com/sjxiang/social/internal/store"
-// )
-
-// type userKey string
-
-// const userCtx userKey = "user"
 
 // // GetUser godoc
 // //
@@ -153,9 +142,4 @@ package main
 // 	if err := app.jsonResponse(w, http.StatusNoContent, ""); err != nil {
 // 		app.internalServerError(w, r, err)
 // 	}
-// }
-
-// func getUserFromContext(r *http.Request) *store.User {
-// 	user, _ := r.Context().Value(userCtx).(*store.User)
-// 	return user
 // }
