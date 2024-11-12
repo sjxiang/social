@@ -8,7 +8,7 @@ import (
 )
 
 
-var ErrTokenExpiry = errors.New("token is expired")
+var ErrExpiredToken = errors.New("token is expired")
 
 
 type Maker interface {

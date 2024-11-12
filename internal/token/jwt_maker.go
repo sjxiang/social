@@ -45,7 +45,7 @@ func (maker *JWTMaker) VerifyToken(accessToken string) (*Payload, error) {
 	_, err := jwt.ParseWithClaims(accessToken, payload, keyFunc)
 	if err != nil {
 		if strings.HasPrefix(err.Error(), "token has invalid claims: token is expired") {
-			return nil,  ErrTokenExpiry   // 过期
+			return nil,  ErrExpiredToken  // 过期
 		}
 
 		return nil, err  // 内容被篡改; 例, 签名和密钥对不上...

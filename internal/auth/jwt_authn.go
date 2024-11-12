@@ -17,7 +17,6 @@ func NewJWTAuthenticator(secret, iss string) *JWTAuthenticator {
 }
 
 
-
 func (a *JWTAuthenticator) GenerateToken(userID int64, duration time.Duration) (string, error) {
 	
 	expires := time.Now().Add(duration).Unix()

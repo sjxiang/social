@@ -5,11 +5,10 @@ import (
 	"encoding/hex"
 )
 
-// 返回摘要字符串	
-func Sum(plainToken string) string {
-	// 摘要
-	hash := md5.Sum([]byte(plainToken))
-	// bytes 转 string
-	return hex.EncodeToString(hash[:])
-}
 
+// 返回摘要字符串
+func HashifyStr(plainToken string) string {
+	h := md5.New()
+	h.Write([]byte(plainToken))
+	return hex.EncodeToString(h.Sum(nil))
+}

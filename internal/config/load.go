@@ -28,7 +28,8 @@ func LoadConf() (Config, error) {
 			},
 			Token: TokenOptions{
 				SecretKey: env.GetString("AUTH_TOKEN_SECRET_KEY", "8xEMrWkBARcDDYQ"),
-				Exp:    time.Hour * 24 * 3, // 3 days
+				Issuer:    "Gua",
+				Exp:       time.Hour * 24 * 3, // 3 days
 			},
 		},
 		MySQL: MySQLOptions{

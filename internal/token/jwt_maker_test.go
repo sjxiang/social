@@ -1,37 +1,49 @@
 package token
 
 import (
-	"time"
-	"errors"
 	"testing"
+	"time"
+
+	"github.com/stretchr/testify/require"
+	"github.com/sjxiang/social/internal/utils"
+	
 )
 
-func TestCreateToken(t *testing.T) {
-	payload := Payload{
-		Email: "gua@vip.cn",
-		Role:  "admin",
+
+func TestJWTMaker(t *testing.T) {
+	maker := NewJWTMaker(utils.RandomString(32), "gua")
+	
+	want := Payload{
+		Email: utils.RandomEmail(),
+		Role:  utils.RandomRole(),
 	}
 
-	maker := NewJWTMaker("8xEMrWkBARcDDYQ", "JUEJIN")
+	token, err := maker.CreateToken(want, time.Minute)
+	require.NoError(t, err)
+	require.NotEmpty(t, token)
+	
+	have, err := maker.VerifyToken(token)
+	require.NoError(t, err)
+	require.NotNil(t, have)
 
-	token, err := maker.CreateToken(payload, time.Minute*3)
-	if err!= nil {
-		t.Fatal(err)
-	}
-
-	t.Log(token)
+	require.Equal(t, have.Email, want.Email)
+	require.Equal(t, have.Role, want.Role)
 }
 
-func TestVerifyToken(t *testing.T) {
-	maker := NewJWTMaker("8xEMrWkBARcDDYQ", "JUEJIN")
+func TestExpiredJWTToken(t *testing.T) {
+	maker := NewJWTMaker(utils.RandomString(32), "gua")
 	
-	payload, err := maker.VerifyToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJKVUVKSU4iLCJleHAiOjE3MzEzNTg1MTAsImlhdCI6MTczMTM1ODMzMCwiZW1haWwiOiJndWFAdmlwLmNuIiwicm9sZSI6ImFkbWluIn0.IQSJ9IR0ELuGDfXwnvfr7O0bCUbLMKH7WxqxbNhOyrE")
-	if errors.Is(err, ErrTokenExpiry) {
-		t.Fatal("过期了")
+	want := Payload{
+		Email: utils.RandomEmail(),
+		Role:  utils.RandomRole(),
 	}
-	if err!= nil {
-		t.Fatal(err)
-	} 
-	
-	t.Log(payload)
+
+	token, err := maker.CreateToken(want, -time.Minute)
+	require.NoError(t, err)
+	require.NotEmpty(t, token)
+
+	have, err := maker.VerifyToken(token)
+	require.Error(t, err)
+	require.EqualError(t, err, ErrExpiredToken.Error())
+	require.Nil(t, have)
 }

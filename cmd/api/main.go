@@ -44,10 +44,16 @@ func main() {
 	// Mailer
 	
 	// Authenticator
-	authenticator := auth.NewJWTAuthenticator(cfg.Auth.Token.SecretKey, "JUEJIN")
+	authenticator := auth.NewJWTAuthenticator(
+		cfg.Auth.Token.SecretKey, 
+		cfg.Auth.Token.Issuer,
+	)
 
 	// Token Maker
-	tokenMaker := token.NewJWTMaker(cfg.Auth.Token.SecretKey, "JUEJIN")
+	tokenMaker := token.NewJWTMaker(
+		cfg.Auth.Token.SecretKey, 
+		cfg.Auth.Token.Issuer,
+	)
 
 	app := &application{
 		config:        cfg,

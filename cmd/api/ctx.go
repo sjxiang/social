@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/sjxiang/social/internal/db"
+	"github.com/sjxiang/social/internal/data"
 )
 
 type ctxKey string
@@ -12,17 +12,17 @@ type ctxKey string
 const (
 	userKey ctxKey = "user"
 	roleKey ctxKey = "role"
-	postKey ctxKey = "post"
 )
 
-func setUserToContext(ctx context.Context, arg db.User) context.Context {
+
+func setUserToContext(ctx context.Context, arg data.User) context.Context {
 	return context.WithValue(ctx, userKey, arg)
 }
 
-func getUserFromContext(r *http.Request) db.User {
-	v, ok := r.Context().Value(userKey).(db.User)
+func getUserFromContext(r *http.Request) data.User {
+	v, ok := r.Context().Value(userKey).(data.User)
 	if !ok {
-		return db.User{}
+		return data.User{}
 	}
 
 	return v

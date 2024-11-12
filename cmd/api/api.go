@@ -16,7 +16,7 @@ import (
 
 	"github.com/sjxiang/social/internal/auth"
 	"github.com/sjxiang/social/internal/config"
-	"github.com/sjxiang/social/internal/db"
+	"github.com/sjxiang/social/internal/data"
 	"github.com/sjxiang/social/internal/mailer"
 	"github.com/sjxiang/social/internal/ratelimiter"
 	"github.com/sjxiang/social/internal/token"
@@ -26,7 +26,7 @@ import (
 type application struct {
 	config        config.Config
 	logger        *zap.SugaredLogger
-	store         db.MySQLStorage
+	store         data.MySQLStorage
 	rateLimiter   ratelimiter.Limiter
 	mailer        mailer.Mailer
 	authenticator auth.Authenticator

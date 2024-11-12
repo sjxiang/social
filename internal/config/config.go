@@ -33,6 +33,7 @@ type BasicOptions struct {
 
 type TokenOptions struct {
 	SecretKey string
+	Issuer    string
 	Exp       time.Duration
 }
 
