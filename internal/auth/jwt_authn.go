@@ -65,14 +65,15 @@ func (a *JWTAuthenticator) ValidateToken(AccessToken string) (int64, error) {
 		return 0, fmt.Errorf("failed to get expires from claims")
 	}
 
+	if time.Now().Unix() > int64(expires) {
+		return 0, ErrTokenExpiry // 过期
+	}
+
 	userID, ok := claims["id"].(int64)
 	if !ok {
 		return 0, fmt.Errorf("failed to get userID from claims")
 	}
 
-	if time.Now().Unix() > int64(expires) {
-		return 0, ErrTokenExpiry // 过期
-	}
-
 	return userID, nil
 }
+

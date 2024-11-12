@@ -8,11 +8,12 @@ import (
 	"net/http"
 	"strings"
 	
-	tt "github.com/sjxiang/social/internal/token"
+	"github.com/sjxiang/social/internal/token"
 )
 
 func (app *application) AuthTokenMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
 			app.unauthorizedErrorResponse(w, r, fmt.Errorf("authorization header is missing"))
@@ -25,11 +26,11 @@ func (app *application) AuthTokenMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		token := parts[1]
+		accessToken := parts[1]
 		// 验证
-		payload, err := app.tokenMaker.VerifyToken(token)
+		payload, err := app.tokenMaker.VerifyToken(accessToken)
 		if err != nil {
-			if errors.Is(err, tt.ErrExpiredToken) {
+			if errors.Is(err, token.ErrExpiredToken) {
 				app.unauthorizedErrorResponse(w, r, err)
 				return
 			}
@@ -38,14 +39,15 @@ func (app *application) AuthTokenMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		// 携带
 		ctx := r.Context()
+
 		user, err := app.store.User.GetByEmail(ctx, payload.Email)
 		if err != nil {
 			app.unauthorizedErrorResponse(w, r, err)
 			return
 		}
 		
+		// 携带
 		ctx = context.WithValue(ctx, userKey, user)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
@@ -101,4 +103,18 @@ func Authenticate() {
 // 授权
 func Authorize() {
 
+}
+
+
+// 限流
+func (app *application) RateLimiterMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		
+		if allow, retryAfter := app.rateLimiter.Allow(r.RemoteAddr); !allow {
+			app.rateLimitExceededResponse(w, r, retryAfter.String())
+			return
+		}
+	
+		next.ServeHTTP(w, r)
+	})
 }

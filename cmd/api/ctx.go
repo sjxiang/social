@@ -1,7 +1,7 @@
 package main
 
 import (
-	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/sjxiang/social/internal/data"
@@ -15,15 +15,12 @@ const (
 )
 
 
-func setUserToContext(ctx context.Context, arg data.User) context.Context {
-	return context.WithValue(ctx, userKey, arg)
-}
-
-func getUserFromContext(r *http.Request) data.User {
+func getUserFromContext(r *http.Request) (data.User, error) {
 	v, ok := r.Context().Value(userKey).(data.User)
+
 	if !ok {
-		return data.User{}
+		return data.User{}, fmt.Errorf("user not found")  // 类型断言失败
 	}
 
-	return v
+	return v, nil 
 }

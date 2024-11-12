@@ -51,9 +51,15 @@ func (app *application) mount() http.Handler {
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
 	
+	// 限流
+	if app.config.RateLimiter.Enabled {
+		r.Use(app.RateLimiterMiddleware)
+	}
+
 	// 设置超时请求为 60s
 	r.Use(middleware.Timeout(60 * time.Second))
 
+	// 路由
 	r.Route("/v1", func(r chi.Router) {
 		r.Get("/health", app.healthCheckHandler)
 	})
