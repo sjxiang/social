@@ -14,6 +14,7 @@ const version = "1.1.0"
 
 func main() {
 	
+	
 	logger := logger.Must("社区")
 	defer logger.Sync()
 

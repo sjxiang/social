@@ -48,7 +48,7 @@ func (maker *JWTMaker) VerifyToken(accessToken string) (*Payload, error) {
 			return nil,  ErrExpiredToken  // 过期
 		}
 
-		return nil, err  // 内容被篡改; 例, 签名和密钥对不上...
+		return nil, err  // 内容被篡改; 例, 签名和密钥对不上... 
 	}
 
 	return payload, nil
