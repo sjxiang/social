@@ -1,11 +1,12 @@
 package main
 
 import (
-
+	"github.com/sjxiang/social/internal/auth"
 	"github.com/sjxiang/social/internal/config"
 	"github.com/sjxiang/social/internal/logger"
+	"github.com/sjxiang/social/internal/mail"
+	"github.com/sjxiang/social/internal/ratelimiter"
 	"github.com/sjxiang/social/internal/token"
-	"github.com/sjxiang/social/internal/auth"
 	"github.com/sjxiang/social/internal/utils"
 )
 
@@ -41,11 +42,16 @@ func main() {
 	// Redis
 
 	// Rate limiter
+	fixedWindowLimiter := ratelimiter.NewFixedWindowLimiter(
+		cfg.RateLimiter.RequestsPerTimeFrame, 
+		cfg.RateLimiter.TimeFrame,
+	)
 	
 	// Mailer
+	sender := mail.NewQQmailSender("no-reply", cfg.Mail.FromEmail, cfg.Mail.Password)
 	
 	// Authenticator
-	authenticator := auth.NewJWTAuthenticator(
+	jwtAuthenticator := auth.NewJWTAuthenticator(
 		cfg.Auth.Token.SecretKey, 
 		cfg.Auth.Token.Issuer,
 	)
@@ -58,9 +64,11 @@ func main() {
 
 	app := &application{
 		config:        cfg,
+		mailer:        sender,
 		logger:        logger,
 		tokenMaker:    tokenMaker,
-		authenticator: authenticator,
+		authenticator: jwtAuthenticator,
+		rateLimiter:   fixedWindowLimiter,
 	}
 
 	mux := app.mount()

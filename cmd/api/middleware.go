@@ -1,16 +1,19 @@
 package main
 
 import (
-	"encoding/base64"
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"net/http"
 	"strings"
-	
+
+	"github.com/sjxiang/social/internal/data"
 	"github.com/sjxiang/social/internal/token"
 )
 
+
+// 认证, 例 'Authenticate'
 func (app *application) AuthTokenMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		
@@ -58,6 +61,7 @@ func (app *application) AuthTokenMiddleware(next http.Handler) http.Handler {
 func (app *application) BasicAuthMiddleware() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
 			// read the auth header
 			authHeader := r.Header.Get("Authorization")
 			if authHeader == "" {
@@ -95,14 +99,26 @@ func (app *application) BasicAuthMiddleware() func(http.Handler) http.Handler {
 }
 
 
-// 认证
-func Authenticate() {
+// 检查权限, 例 'Authorize'
+func (app *application) checkRolePrecedence(ctx context.Context, user *data.User, roleName string) (bool, error) {
 
+	role, err := app.store.Role.GetByName(ctx, roleName)
+	if err != nil {
+		return false, err
+	}
+
+	return user.Role.Level >= role.Level, nil
 }
 
-// 授权
-func Authorize() {
 
+// 检查帖子所有权
+func (app *application) checkPostOwnership(requiredRole string, next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		// todo
+
+		next.ServeHTTP(w, r)
+	})
 }
 
 

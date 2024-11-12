@@ -15,7 +15,7 @@ func Must(service string) *zap.SugaredLogger {
 	config.EncoderConfig.EncodeTime = formattedTimeEncoder  // 时间戳格式
 	config.DisableStacktrace = true                         // 打印堆栈
 	config.Level = zap.NewAtomicLevelAt(zapcore.InfoLevel)  // 日志级别, 过滤
-	config.Encoding = "console"                             // 输出编码, 终端 console, 文件 json
+	config.Encoding = "console"                             // 输出编码, 终端控制台 console, 文件 json
 	config.OutputPaths = []string{"stdout", "gua.log"}      // 输出路径
 	config.InitialFields = map[string]any{
 		"service": service,

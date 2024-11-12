@@ -82,4 +82,3 @@ func (cfg *Config) FormattedRedisAddr() string {
 	// "localhost:16379"
 	return fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port)
 }
-
