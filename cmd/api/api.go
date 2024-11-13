@@ -24,12 +24,12 @@ import (
 
 
 type application struct {
-	config        config.Config
 	logger        *zap.SugaredLogger
+	config        config.Config
 	store         data.MySQLStorage
 	rateLimiter   ratelimiter.Limiter
 	mailer        mail.EmailSender
-	authenticator auth.Authenticator
+	auth          auth.Authenticator
 	tokenMaker    token.Maker
 }
 

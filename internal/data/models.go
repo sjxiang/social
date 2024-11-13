@@ -47,19 +47,19 @@ func (p *password) Compare(text string) error {
 type Plan struct {
 	ID                  int       `json:"id"`
 	PlanName            string    `json:"plan_name"`
-	PlanAmount          int       `json:"plan_amount"`
+	PlanAmount          int       `json:"plan_amount"`  // 金额, 单位: 元
 	PlanAmountFormatted string    `json:"plan_amount_formatted"`
 	CreatedAt           time.Time `json:"created_at"`
 	UpdatedAt           time.Time `json:"updated_at"`
 }
 
-
 // 格式化为货币字符串
 func (p *Plan) AmountForDisplay() string {
-	return fmt.Sprintf("%d RMB", p.PlanAmount)
+	return fmt.Sprintf("¥%d", p.PlanAmount)
 }
 
-func (p *Plan) FormattedPlanName() string {
+
+func (p *Plan) PlanNameForDisplay() string {
 	planName := p.PlanName
 
 	if planName == "free" {
@@ -75,6 +75,9 @@ func (p *Plan) FormattedPlanName() string {
 	}
 }
 
+func (p *Plan) ForDisplay() (string, string) {
+	return p.PlanNameForDisplay(), p.AmountForDisplay()
+}
 
 // var RoleSet = []Role{
 // 	{	

@@ -67,7 +67,7 @@ func main() {
 		mailer:        sender,
 		logger:        logger,
 		tokenMaker:    tokenMaker,
-		authenticator: jwtAuthenticator,
+		auth:          jwtAuthenticator,
 		rateLimiter:   fixedWindowLimiter,
 	}
 

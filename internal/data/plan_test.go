@@ -39,7 +39,7 @@ func TestGetOnePlan(t *testing.T) {
 	defer db.Close()
 
 	store := NewMySQLStorage(db)
-	plan, err := store.Plans.GetOne(context.Background(), 1)
+	plan, err := store.Plans.GetOne(context.Background(), 4)
 	if err!= nil {
 		t.Fatal(err)
 	}

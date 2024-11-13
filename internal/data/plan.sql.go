@@ -35,7 +35,7 @@ func (m *MySQLPlanStore) GetAll(ctx context.Context) ([]*Plan, error) {
 			&plan.CreatedAt,
 			&plan.UpdatedAt,
 		)
-		plan.PlanAmountFormatted = plan.AmountForDisplay()
+		plan.PlanName, plan.PlanAmountFormatted = plan.ForDisplay()
 		
 		if err != nil {
 			return nil, err
@@ -74,7 +74,7 @@ func (m *MySQLPlanStore) GetOne(ctx context.Context, id int64) (*Plan, error) {
 		return nil, err
 	}
 
-	i.PlanAmountFormatted = i.AmountForDisplay()
+	i.PlanName, i.PlanAmountFormatted = i.ForDisplay()
 
 	return &i, nil
 }
