@@ -2,7 +2,6 @@ package data
 
 import (
 	"context"
-	"database/sql"
 	"testing"
 	"time"
 
@@ -11,16 +10,6 @@ import (
 	"github.com/sjxiang/social/internal/utils"
 )
 
-func initDB() *sql.DB {
-	dsn := "root:my-secret-pw@tcp(127.0.0.1:13306)/social?charset=utf8&parseTime=True&loc=Local"
-
-	db, err := utils.NewMySQL(dsn, 30, 30, "15m")
-	if err != nil {
-		panic(err)
-	}
-
-	return db
-}	
 
 func TestCreateAndInvite(t *testing.T) {
 	
@@ -55,4 +44,91 @@ func TestCreateAndInvite(t *testing.T) {
 	t.Log("创建用户和邀请码成功")
 }
 
+
+func TestActivate(t *testing.T) {
+	
+	if testing.Short() {
+		t.Skip()
+	}
+
+	db := initDB()
+	defer db.Close()
+
+	store := NewMySQLStorage(db)
+
+	if err := store.Users.Activate(context.TODO(), "bc8fb4b8efcd46753c8a9499a1fb6f2d"); err!= nil {
+		t.Fatal(err)
+	}
+
+	t.Log("激活用户成功")
+}
+
+
+
+func TestGetOneUser(t *testing.T) {
+	
+	if testing.Short() {
+		t.Skip()
+	}
+
+	db := initDB()
+	defer db.Close()
+
+	store := NewMySQLStorage(db)
+
+	user, err := store.Users.GetOne(context.TODO(), 7)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Logf("%+v\n", user)
+	t.Log("查询单个用户, ok")
+}
+
+func TestGetOneUserByEmail(t *testing.T) {
+	
+	if testing.Short() {
+		t.Skip()
+	}
+
+	db := initDB()
+	defer db.Close()
+
+	store := NewMySQLStorage(db)
+
+	user, err := store.Users.GetByEmail(context.TODO(), "gua@vip.cn")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Logf("%+v\n", user)
+	t.Log("查询单个用户, ok")
+}
+
+
+func TestModPassword(t *testing.T) {
+
+	if testing.Short() {
+		t.Skip()
+	}
+
+	db := initDB()
+	defer db.Close()
+
+	store := NewMySQLStorage(db)
+
+	params := User{
+		ID: 7,
+	}
+
+	if err := params.Password.Set("654321"); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := store.Users.ModPassword(context.TODO(), params); err!= nil {
+		t.Fatal(err)
+	}
+
+	t.Log("修改用户密码成功")
+}
 

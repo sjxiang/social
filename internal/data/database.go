@@ -32,6 +32,13 @@ type MySQLStorage struct {
 
 		// 评论
 
+		// 订阅计划
+		Plans interface {
+			GetAll(ctx context.Context) ([]*Plan, error)
+			GetOne(ctx context.Context, id int64) (*Plan, error)
+			SubscribeUserToPlan(ctx context.Context, arg User) error
+		}
+
 
 	
 }
@@ -39,6 +46,7 @@ type MySQLStorage struct {
 func NewMySQLStorage(db *sql.DB) MySQLStorage {
 	return MySQLStorage{
 		Users: &MySQLUserStore{db: db},
+		Plans: &MySQLPlanStore{db: db},
 	}
 }
 

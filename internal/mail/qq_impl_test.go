@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/sjxiang/social/internal/utils"
 )
 
 var (
@@ -25,11 +27,11 @@ func TestSendMail(t *testing.T) {
 	// 测试邮件发送
 	sender := NewQQmailSender("no-reply", sender, password)
 	
-	arg := Params{
+	params := utils.MailTemplateParams{
 		Username:      "xxx",
 		ActivationURL: "www.baidu.com",
 	}
-	content, err := BuildPlainTextMessage(arg)
+	content, err := utils.BuildPlainTextMessage(params)
 	require.NoError(t, err)
 
 	if err := sender.SendEmail("这是一封测试邮件", content, []string{receiver}, nil, nil, nil); err != nil {

@@ -2,6 +2,7 @@ package data
 
 import (
 	"time"
+	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -42,7 +43,7 @@ func (p *password) Compare(text string) error {
 }
 
 
-// 会员订阅计划
+// 会员订阅计划 subscription plans
 type Plan struct {
 	ID                  int       `json:"id"`
 	PlanName            string    `json:"plan_name"`
@@ -50,6 +51,12 @@ type Plan struct {
 	PlanAmountFormatted string    `json:"plan_amount_formatted"`
 	CreatedAt           time.Time `json:"created_at"`
 	UpdatedAt           time.Time `json:"updated_at"`
+}
+
+
+// 格式化为货币字符串
+func (p *Plan) AmountForDisplay() string {
+	return fmt.Sprintf("%d RMB", p.PlanAmount)
 }
 
 func (p *Plan) FormattedPlanName() string {

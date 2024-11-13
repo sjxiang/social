@@ -21,6 +21,9 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户表';
 
 
+
+-- 表 2
+
 DROP TABLE IF EXISTS `plans`;
 
 CREATE TABLE `plans` (
@@ -39,6 +42,8 @@ INSERT INTO `plans` (`plan_name`, `plan_amount`) VALUES ('pro', '100');
 INSERT INTO `plans` (`plan_name`, `plan_amount`) VALUES ('enterprise', '1000');
 
 
+
+-- 表 3
 DROP TABLE IF EXISTS `user_plans`;
 
 CREATE TABLE `user_plans` (
@@ -52,7 +57,7 @@ CREATE TABLE `user_plans` (
 
 
 
--- 表 3
+-- 表 4
 -- 多个帖子可以是同一个用户发的
 DROP TABLE IF EXISTS `posts`;
 
@@ -69,7 +74,7 @@ CREATE TABLE `posts` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='帖子表';
 
 
--- 表 4
+-- 表 5
 -- 一个帖子可以有多个评论
 DROP TABLE IF EXISTS `comments`;
 
@@ -83,7 +88,7 @@ CREATE TABLE `comments` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='评论表';
 
 
--- 表 5
+-- 表 6
 -- 一个阿婆主可以有多个粉丝
 DROP TABLE IF EXISTS `followers`;
 
@@ -96,7 +101,7 @@ CREATE TABLE `followers` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='关注表';
 
 
--- 表 6
+-- 表 7
 -- 一个用户可以有多个邀请码
 DROP TABLE IF EXISTS `user_invitations`;
 

@@ -15,12 +15,13 @@ func (m *MySQLUserStore) CreateAndInvite(ctx context.Context, arg User, token st
 	return withTx(m.db, ctx, func(tx *sql.Tx) error {
 		
 		// 创建用户
-		if err := m.create(ctx, tx, arg); err != nil {
+		userID, err := m.create(ctx, tx, arg)
+		if err != nil {
 			return err
 		}
 
 		// 创建邀请码
-		if err := m.createUserInvitation(ctx, tx, token, invitationExp, arg.ID); err != nil {
+		if err := m.createUserInvitation(ctx, tx, token, invitationExp, userID); err != nil {
 			return err
 		}
 
@@ -29,14 +30,14 @@ func (m *MySQLUserStore) CreateAndInvite(ctx context.Context, arg User, token st
 }
 
 // 创建用户
-func (m *MySQLUserStore) create(ctx context.Context, tx *sql.Tx, arg User) error {
+func (m *MySQLUserStore) create(ctx context.Context, tx *sql.Tx, arg User) (int64, error) {
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
 	defer cancel()
 
 	stmt := `insert into users (username, email, password, is_active, role, created_at, updated_at)
 		values (?, ?, ?, ?, ?, ?, ?)`
 
-	_, err := tx.ExecContext(ctx, stmt, 
+	result, err := tx.ExecContext(ctx, stmt, 
 		arg.Username, 
 		arg.Email,
 		arg.Password.hash, 
@@ -52,16 +53,21 @@ func (m *MySQLUserStore) create(ctx context.Context, tx *sql.Tx, arg User) error
 			switch {
 			case mysqlError.Number == 1062 && 
 					strings.Contains(mysqlError.Message, "users.idx_username"):
-				return ErrDuplicateUsername
+				return 0, ErrDuplicateUsername
 			case mysqlError.Number == 1062 && 
 					strings.Contains(mysqlError.Message, "users.idx_email"):
-				return ErrDuplicateEmail
+				return 0, ErrDuplicateEmail
 			}
 		}
-		return err
+		return 0, err
 	}
 
-	return nil
+	id, err := result.LastInsertId()
+	if err!= nil {
+		return 0, err
+	}
+
+	return id, nil
 }
 
 
@@ -70,7 +76,8 @@ func (m *MySQLUserStore) createUserInvitation(ctx context.Context, tx *sql.Tx, t
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
 	defer cancel()
 
-	stmt := `insert into user_invitations (token, user_id, expiry) 
+	stmt := `
+		insert into user_invitations (token, user_id, expiry) 
 		values (?, ?, ?)`
 
 	_, err := tx.ExecContext(ctx, stmt, token, userID, time.Now().Add(exp))
