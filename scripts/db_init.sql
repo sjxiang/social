@@ -10,36 +10,46 @@ CREATE TABLE `users` (
     `id`                  bigint(20) unsigned NOT NULL AUTO_INCREMENT,
     `email`               varchar(255)        NOT NULL,
     `username`            varchar(255)        NOT NULL,
-    `password`            varchar(255)        NOT NULL DEFAULT '',
+    `password`            varchar(255)        NOT NULL DEFAULT ''  COMMENT '密码',
     `is_active`           tinyint(4)          NOT NULL DEFAULT '0' COMMENT '0 未激活, 1 激活',
+    `role`                tinyint(4)          NOT NULL DEFAULT '0' COMMENT '角色, 0 游客, 1 用户, 2 版主, 3 管理员',
     `created_at`          timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `role_id`             bigint(20)          NOT NULL DEFAULT '1' COMMENT '角色id',
+    `updated_at`          timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     UNIQUE KEY `idx_email` (`email`),
     UNIQUE KEY `idx_username` (`username`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户表';
 
 
--- 表 2
--- 角色, 单一
-DROP TABLE IF EXISTS `roles`;
+DROP TABLE IF EXISTS `plans`;
 
-CREATE TABLE `roles` (
+CREATE TABLE `plans` (
     `id`             bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    `name`           varchar(64)         NOT NULL,
-    `level`          tinyint(4)          NOT NULL DEFAULT '0' COMMENT '0 游客, 1 用户, 2 版主, 3 管理员',
-    `description`    varchar(1024)       NOT NULL DEFAULT '',
+    `plan_name`      varchar(64)         NOT NULL DEFAULT ''  COMMENT '订阅计划名称',
+    `plan_amount`    bigint              NOT NULL DEFAULT '0' COMMENT '订阅计划费用',
+    `created_at`     timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at`     timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `idx_name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='角色表';
+    UNIQUE KEY `idx_plan_name` (`plan_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='订阅计划表';
 
-INSERT INTO `roles` (`name`, `level`, `description`) VALUES ('guest', '0', 'A guest can only read posts');
+INSERT INTO `plans` (`plan_name`, `plan_amount`) VALUES ('free', '0');
+INSERT INTO `plans` (`plan_name`, `plan_amount`) VALUES ('basic', '10');
+INSERT INTO `plans` (`plan_name`, `plan_amount`) VALUES ('pro', '100');
+INSERT INTO `plans` (`plan_name`, `plan_amount`) VALUES ('enterprise', '1000');
 
-INSERT INTO `roles` (`name`, `level`, `description`) VALUES ('user', '1', 'A user can create posts and comments');
 
-INSERT INTO `roles` (`name`, `level`, `description`) VALUES ('moderator', '2', 'A moderator can update other users posts');
+DROP TABLE IF EXISTS `user_plans`;
 
-INSERT INTO `roles` (`name`, `level`, `description`) VALUES ('admin', '3', 'An admin can update and delete other users posts');
+CREATE TABLE `user_plans` (
+    `id`             bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    `user_id`        bigint              NOT NULL DEFAULT '0' COMMENT '用户 id',
+    `plan_id`        bigint              NOT NULL DEFAULT '0' COMMENT '订阅计划 id',
+    `created_at`     timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at`     timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户订阅表';
+
 
 
 -- 表 3

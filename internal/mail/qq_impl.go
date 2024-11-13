@@ -52,7 +52,7 @@ type Params struct {
 	ActivationURL string
 }
 
-func FormattedContent(arg Params) (string, error) {
+func BuildPlainTextMessage(arg Params) (string, error) {
 	example := `
 您好，{{ .Username }}<br>
 <br>
@@ -74,11 +74,8 @@ func FormattedContent(arg Params) (string, error) {
 ━━━━━━━━━━━━━━━━<br>
 社区小管家<br>`
 
-	// 定义模板
-	tpl := template.New("user_invitation")
-
-	// 解析模板
-	tpl, err := tpl.Parse(example)
+	// 定义模板, 解析模板
+	tpl, err := template.New("user_invitation").Parse(example)
 	if  err != nil {
 		return "", err
 	}
@@ -90,7 +87,9 @@ func FormattedContent(arg Params) (string, error) {
 		return "", err
 	}
 	
-	return buffer.String(), nil 
+	formattedMessage := buffer.String()
+
+	return formattedMessage, nil 
 }
 
 

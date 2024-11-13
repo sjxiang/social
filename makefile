@@ -16,6 +16,8 @@ redis-container-console:
 	@echo "redis-cli"
 	docker exec -it cache sh
 
+test:
+	go test -short -v ./...
 
 .PHONY: run mysql-container-console redis-container-console
 

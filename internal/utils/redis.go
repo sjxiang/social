@@ -10,8 +10,8 @@ import (
 func NewRedis(addr, pw string, db int) (*redis.Client, error) {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     addr,
-		Password: pw,  // no password set
-		DB:       db,  // use default DB
+		Password: pw,  
+		DB:       db,  
 	})
 	
 	_, err := rdb.Ping(context.TODO()).Result()

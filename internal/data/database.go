@@ -6,47 +6,60 @@ import (
 	"database/sql"
 )
 
+
 var (
 	QueryTimeoutDuration = time.Second * 5
 )
 
 
 type MySQLStorage struct {
-		// 动态
-		Post interface {
-			Create(context.Context) error
-		}
-		
-		// 评论
-		Comments interface {
-			Create(context.Context) error
-		}
-
-		// 用户
-		User interface {
-			GetByID(context.Context, int64) (*User, error)
-			GetByEmail(context.Context, string) (*User, error)
-			Exists(context.Context, int64) (bool, error)
-			Create(context.Context, *sql.Tx, *User) error
-			CreateAndInvite(ctx context.Context, user *User, token string, exp time.Duration) error
-			Activate(context.Context, string) error
-			Delete(context.Context, int64) error
-			ModPassword(context.Context, *User) error
-		}
 	
-		// 角色
-		Role interface {
-			GetByName(context.Context, string) (*Role, error)
+		// 用户
+		Users interface {
+			GetOne(ctx context.Context, id int64) (*User, error)
+			Exists(ctx context.Context, id int64) (bool, error)
+			GetByEmail(ctx context.Context, email string) (*User, error)
+			Delete(ctx context.Context, id int64) error
+
+			CreateAndInvite(ctx context.Context, arg User, token string, invitationExp time.Duration) error
+			Activate(ctx context.Context, token string) error
+
+			ModPassword(ctx context.Context, arg User) error
 		}
 
+		// 帖子
+
+
+		// 评论
+
+
+	
 }
 
 func NewMySQLStorage(db *sql.DB) MySQLStorage {
 	return MySQLStorage{
-		// UserStore:     &MySQLUserStore{db},
-		Role:   NewMySQLRoleStore(db),
+		Users: &MySQLUserStore{db: db},
 	}
 }
+
+
+type MySQLUserStore struct {
+	db *sql.DB
+}
+
+
+type MySQLPostStore struct {
+	db *sql.DB
+}
+
+type MySQLCommentStore struct {
+	db *sql.DB
+}
+
+type MySQLPlanStore struct {
+	db *sql.DB
+}
+
 
 /*
 

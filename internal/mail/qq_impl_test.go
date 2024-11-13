@@ -17,18 +17,19 @@ var (
 
 func TestSendMail(t *testing.T) {
 
-	// go test -short tag, 会跳过该项测试 
+	// '-short' tag, 会跳过该项测试 
 	if testing.Short() {
 		t.Skip()
 	}
 
 	// 测试邮件发送
 	sender := NewQQmailSender("no-reply", sender, password)
+	
 	arg := Params{
 		Username:      "xxx",
 		ActivationURL: "www.baidu.com",
 	}
-	content, err := FormattedContent(arg)
+	content, err := BuildPlainTextMessage(arg)
 	require.NoError(t, err)
 
 	if err := sender.SendEmail("这是一封测试邮件", content, []string{receiver}, nil, nil, nil); err != nil {
