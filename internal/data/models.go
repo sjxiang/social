@@ -79,30 +79,3 @@ func (p *Plan) ForDisplay() (string, string) {
 	return p.PlanNameForDisplay(), p.AmountForDisplay()
 }
 
-// var RoleSet = []Role{
-// 	{	
-// 		ID: 1,
-// 		Name: "admin",
-// 		Level: 4,
-// 		Description: "管理员, 可以修改和删掉阿婆主的动态",
-// 	},
-// 	{
-// 		ID: 2,
-// 		Name: "moderator",
-// 		Level: 3,
-// 		Description: "版主, 可以修改阿婆主的动态",
-// 	},
-// 	{
-// 		ID: 3,
-// 		Name: "user",
-// 		Level: 2,
-// 		Description: "用户, 可以发动态和评论",
-// 	},
-// 	{
-// 		ID: 4,
-// 		Name: "guest",
-// 		Level: 1,
-// 		Description: "游客, 只能浏览动态",
-// 	},
-// }
-

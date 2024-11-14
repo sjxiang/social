@@ -50,8 +50,8 @@ func (app *application) AuthTokenMiddleware(next http.Handler) http.Handler {
 			return
 		}
 		
-		// 携带
-		ctx = context.WithValue(ctx, userKey, user)
+		// 将用户信息放入上下文中
+		ctx = context.WithValue(ctx, ctxKeyUser, user)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
@@ -99,7 +99,7 @@ func (app *application) BasicAuthMiddleware() func(http.Handler) http.Handler {
 }
 
 
-// 检查权限, 例 'Authorize'
+// 检查权限 Per, 例 'Authorize'
 func (app *application) checkRolePrecedence(ctx context.Context, user *data.User, roleName string) (bool, error) {
 	return true, nil
 

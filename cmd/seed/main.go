@@ -11,6 +11,9 @@ package main
 
 // 	"github.com/sikozonpc/social/internal/store"
 // )
+var usernames = []string{"alice", "bob", "charlie", "dave", "eve", "frank", "grace", "heidi",
+	"ivan", "judy", "karl", "laura", "mallory", "nina", "oscar", "peggy",
+	"quinn", "rachel", "steve", "trent", "urs"}
 
 // var usernames = []string{
 // 	"alice", "bob", "charlie", "dave", "eve", "frank", "grace", "heidi",

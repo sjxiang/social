@@ -58,14 +58,14 @@ func (m *MySQLUserStore) update(ctx context.Context, tx *sql.Tx, arg *User) erro
 	defer cancel()
 
 	stmt := `
-		UPDATE 
+		update 
 			users 
-		SET 
+		set 
 			username = ?, 
 			email = ?, 
 			is_active = ?,
 			updated_at = UTC_TIMESTAMP() 
-		WHERE 
+		where 
 			id = ?`
 
 	_, err := tx.ExecContext(ctx, stmt, 

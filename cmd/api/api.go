@@ -52,7 +52,7 @@ func (app *application) mount() http.Handler {
 	}))
 	
 	// 限流
-	if app.config.RateLimiter.Enabled {
+	if app.config.RateLimit.Enabled {
 		r.Use(app.RateLimiterMiddleware)
 	}
 

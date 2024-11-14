@@ -13,7 +13,7 @@ func TestGetAllPlans(t *testing.T) {
 		t.Skip()
 	}
 	
-	db := initDB()
+	db := initdb()
 	defer db.Close()
 
 	store := NewMySQLStorage(db)
@@ -35,7 +35,7 @@ func TestGetOnePlan(t *testing.T) {
 		t.Skip()
 	}
 	
-	db := initDB()
+	db := initdb()
 	defer db.Close()
 
 	store := NewMySQLStorage(db)
@@ -55,7 +55,7 @@ func TestSubscribeUserToPlan(t *testing.T) {
 		t.Skip()
 	}
 	
-	db := initDB()
+	db := initdb()
 	defer db.Close()
 
 	store := NewMySQLStorage(db)

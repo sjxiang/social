@@ -14,7 +14,7 @@ import (
 
 https://login.sendgrid.com/login/password
 
-要先拿到 sendgrid 的 api key
+要先拿到 sendgrid 的 api key, 第三方代理
 
  */
 

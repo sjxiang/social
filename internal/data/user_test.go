@@ -17,7 +17,7 @@ func TestCreateAndInvite(t *testing.T) {
 		t.Skip()
 	}
 	
-	db := initDB()
+	db := initdb()
 	defer db.Close()
 
 	store := NewMySQLStorage(db)
@@ -51,7 +51,7 @@ func TestActivate(t *testing.T) {
 		t.Skip()
 	}
 
-	db := initDB()
+	db := initdb()
 	defer db.Close()
 
 	store := NewMySQLStorage(db)
@@ -71,7 +71,7 @@ func TestGetOneUser(t *testing.T) {
 		t.Skip()
 	}
 
-	db := initDB()
+	db := initdb()
 	defer db.Close()
 
 	store := NewMySQLStorage(db)
@@ -91,7 +91,7 @@ func TestGetOneUserByEmail(t *testing.T) {
 		t.Skip()
 	}
 
-	db := initDB()
+	db := initdb()
 	defer db.Close()
 
 	store := NewMySQLStorage(db)
@@ -112,7 +112,7 @@ func TestModPassword(t *testing.T) {
 		t.Skip()
 	}
 
-	db := initDB()
+	db := initdb()
 	defer db.Close()
 
 	store := NewMySQLStorage(db)

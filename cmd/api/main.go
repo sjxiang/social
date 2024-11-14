@@ -20,17 +20,18 @@ func main() {
 	defer logger.Sync()
 
 	// dotenv
-	cfg, err := config.LoadConf()
+	cfg, err := config.New()
 	if err != nil {
 		logger.Fatal(err)
 	}
+	logger.Info("配置清单", cfg)
 
 	// MySQL
 	db, err := utils.NewMySQL(
 		cfg.FormattedMySQLAddr(),
-		cfg.MySQL.MaxOpenConns,
-		cfg.MySQL.MaxIdleConns,
-		cfg.MySQL.MaxIdleTime,
+		cfg.Database.MySQLMaxOpenConns,
+		cfg.Database.MySQLMaxIdleConns,
+		cfg.Database.MySQLMaxIdleTime,
 	)
 	if err!= nil {
 		logger.Fatal(err)
@@ -43,23 +44,23 @@ func main() {
 
 	// Rate limiter
 	fixedWindowLimiter := ratelimiter.NewFixedWindowLimiter(
-		cfg.RateLimiter.RequestsPerTimeFrame, 
-		cfg.RateLimiter.TimeFrame,
+		cfg.RateLimit.RequestsPerTimeFrame, 
+		cfg.RateLimit.TimeFrame,
 	)
 	
 	// Mailer
-	sender := mail.NewQQmailSender("no-reply", cfg.Mail.FromEmail, cfg.Mail.Password)
+	sender := mail.NewQQmailSender("no-reply", cfg.Mail.FromEmail, cfg.Mail.ApiKey)
 	
 	// Authenticator
 	jwtAuthenticator := auth.NewJWTAuthenticator(
-		cfg.Auth.Token.SecretKey, 
-		cfg.Auth.Token.Issuer,
+		cfg.Auth.JWT.SecretKey, 
+		cfg.Auth.JWT.Issuer,
 	)
 
 	// Token Maker
 	tokenMaker := token.NewJWTMaker(
-		cfg.Auth.Token.SecretKey, 
-		cfg.Auth.Token.Issuer,
+		cfg.Auth.JWT.SecretKey, 
+		cfg.Auth.JWT.Issuer,
 	)
 
 	app := &application{
