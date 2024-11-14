@@ -21,14 +21,14 @@ func NewQQmailSender(name, fromEmailAddress, fromEmailPassword string) EmailSend
 	}
 }
 
-func (sender *QQmailSender) SendEmail(subject, content string, to, cc, bcc, attachFiles []string) error {
+func (sender *QQmailSender) SendEmail(subject, body string, to, cc, bcc, attachFiles []string) error {
 	
 	// 发送邮件
 	m := smtplib.NewMessage()
 	m.SetHeader("From", fmt.Sprintf("%s <%s>", sender.name, sender.fromEmailAddress))  
 	m.SetHeader("To", to...)
 	m.SetHeader("Subject", subject)
-	m.SetBody("text/html", content)
+	m.SetBody("text/html", body)
 
 	for _, f := range attachFiles {
 		m.Attach(f)

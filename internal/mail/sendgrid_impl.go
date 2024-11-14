@@ -6,14 +6,24 @@ import (
 
 	"github.com/sendgrid/sendgrid-go"
 	smtp "github.com/sendgrid/sendgrid-go/helpers/mail"
+	"go.uber.org/zap"
 )
 
 
+/*
+
+https://login.sendgrid.com/login/password
+
+要先拿到 sendgrid 的 api key
+
+ */
+
 type SendGridMailer struct {
 	fromEmail string
-	apiKey    string  // 授权码
+	apiKey    string  
 	isSandbox bool    // 是否开启沙箱模式
 	client    *sendgrid.Client  
+	logger    *zap.SugaredLogger
 }
 
 func NewSendgrid(apiKey, fromEmail string, isSandbox bool) *SendGridMailer {
@@ -48,15 +58,16 @@ func (s *SendGridMailer) SendEmail(subject, username, toEmail, body string) (int
 
 		// 发送邮件
 		resp, err := s.client.Send(message)
-		
+
+		s.logger.Error("发送邮件失败", err, "状态码", resp.StatusCode, "响应体", resp.Body, "响应头", resp.Headers)
+
+
 		// 情况一, 多次重试, 寄
 		if err != nil {
 			// 指数补偿
 			time.Sleep(time.Second * time.Duration(i+1))
 			continue
 		}
-
-		fmt.Println(resp.StatusCode, resp.Body, resp.Headers)
 
 		// 情况二, 成功
 		return resp.StatusCode, nil
