@@ -62,12 +62,7 @@ func (m *MySQLUserStore) create(ctx context.Context, tx *sql.Tx, arg User) (int6
 		return 0, err
 	}
 
-	id, err := result.LastInsertId()
-	if err!= nil {
-		return 0, err
-	}
-
-	return id, nil
+	return result.LastInsertId()
 }
 
 
