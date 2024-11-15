@@ -28,6 +28,10 @@ type PostStoreImpl struct {
 	db *sql.DB
 }
 
+func newPostStore(db *sql.DB) PostStore {
+	return &PostStoreImpl{db: db}
+}
+
 func (s *PostStoreImpl) GetUserFeed(ctx context.Context, userID int64, fq PaginatedFeedQuery) ([]PostWithMetadata, error) {
 
 	return nil, nil

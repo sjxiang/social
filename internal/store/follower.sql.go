@@ -18,35 +18,14 @@ type Follower struct {
 	CreatedAt  string `json:"created_at"`
 }
 
-
-// 关注
 type FollowertoreImpl struct {
 	db *sql.DB
 }
 
 
-func newFollowStoreImpl(db *sql.DB) FollowerStore {
+func newFollowStore(db *sql.DB) FollowerStore {
 	return &FollowertoreImpl{db: db}
 }
-
-// 	_, err := s.db.ExecContext(ctx, query, userID, followerID)
-// 	if err != nil {
-// 		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "23505" {
-// 			return ErrConflict
-// 		}
-// 	}
-
-// 	return nil
-// }
-// switch err {
-// case nil:
-// 	return &resp, nil
-// case sqlc.ErrNotFound:
-// 	return nil, ErrNotFound
-// default:
-// 	return nil, err
-// }
-
 
 
 // 关注
@@ -93,7 +72,7 @@ func (f *FollowertoreImpl) Unfollow(ctx context.Context, followerID, userID int6
 }
 
 
-// 获取关注列表
+// 关注列表
 func (f *FollowertoreImpl) GetAllFollowed(ctx context.Context, userID int64) ([]*Follower, error) {
 	query := `
 		select id, user_id, follower_id, created_at from followers 
@@ -150,7 +129,7 @@ func (f *FollowertoreImpl) GetAllFollowedCount(ctx context.Context, userID int64
 	return count, nil 
 }
 
-// 获取粉丝列表
+// 粉丝列表
 func (f *FollowertoreImpl) GetAllFollower(ctx context.Context, userID int64) ([]*Follower, error) {
 	query := `
 		select id, user_id, created_at from followers 
@@ -208,13 +187,3 @@ func (f *FollowertoreImpl) GetAllFollowerCount(ctx context.Context, userID int64
 
 
 
-
-
-
-// select count(*) from followers where user_id = ?;
-// select count(*) from followers where follower_id = ?;
-// select id, follower_id, created_at from followers where user_id
-
-// 		from users u
-// 		left join user_invitations ui on (u.id = ui.user_id)
-// 		where ui.token = ? and ui.expiry > ?`

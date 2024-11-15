@@ -106,7 +106,7 @@ DROP TABLE IF EXISTS `user_invitations`;
 CREATE TABLE `user_invitations` (
     `id`                  bigint(20) unsigned NOT NULL AUTO_INCREMENT,
     `user_id`             bigint(20)          NOT NULL COMMENT '阿婆主的用户id',
-    `token`               VARCHAR(64)         NOT NULL COMMENT '邀请码',
+    `token`               VARCHAR(64)         NOT NULL COMMENT '激活码',
     `expiry`              timestamp           NOT NULL COMMENT '过期时间',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=167 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户激活码';

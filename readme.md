@@ -10,7 +10,7 @@
 
 > 接口文档, 基于 go-swagger 生成 API 文档, 只需一行注释即可生成文档
 
-> 日志, 基于 zap 实现日志记录, 支持文件, 控制台输出
+> 日志, 基于 zap 实现日志记录, 支持文件\控制台输出
 
 > validator, 简单易用的校验器, 只需添加 tag 即可校验
 
@@ -19,4 +19,8 @@
 > 认证, jwt.MapClaims 或者 jwt.RegisteredClaims
 
 > 限流, 固定滑动窗口
+
+> 数据库, MySQL, ❌ ORM, ✅ raw SQL
+
+> 路由, chi
 

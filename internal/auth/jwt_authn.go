@@ -18,12 +18,10 @@ func NewJWTAuthenticator(secret, iss string) *JWTAuthenticator {
 
 
 func (a *JWTAuthenticator) GenerateToken(userID int64, duration time.Duration) (string, error) {
-	
-	expires := time.Now().Add(duration).Unix()
 
 	claims := jwt.MapClaims{
-		"id":      userID,
-		"expires": expires,
+		"user_id": userID,
+		"expires": time.Now().Add(duration).Unix(),
 	}
 	
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -69,7 +67,7 @@ func (a *JWTAuthenticator) ValidateToken(AccessToken string) (int64, error) {
 		return 0, ErrTokenExpiry // 过期
 	}
 
-	userID, ok := claims["id"].(int64)
+	userID, ok := claims["user_id"].(int64)
 	if !ok {
 		return 0, fmt.Errorf("failed to get userID from claims")
 	}

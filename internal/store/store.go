@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"database/sql"
 	"time"
 )
 
@@ -15,45 +16,56 @@ type Storage struct {
 	Posts    PostStore
 	Comments CommentStore
 	Plans    PlanStore
+	Followers FollowerStore
 
 }
 
-func NewStorage(users UserStore, posts PostStore, comments CommentStore, plans PlanStore) Storage {
+func NewStorage(db *sql.DB) Storage {
 	return Storage{
-		Users: users,
-		Posts: posts,
-		Comments: comments,
-		Plans: plans,
+		Users:     newUserStore(db),
+		Plans:     nil,
+		Followers: newFollowStore(db),
+		Posts:     nil,
+		Comments:  newCommentStore(db),
 	}
 }
 
 
 
 type UserStore interface {
-	GetOne(ctx context.Context, id int64) (*User, error)
-	Exists(ctx context.Context, id int64) (bool, error)
+	GetOne(ctx context.Context, userID int64) (*User, error)
+	Exists(ctx context.Context, userID int64) (bool, error)
 	GetByEmail(ctx context.Context, email string) (*User, error)
-	Delete(ctx context.Context, id int64) error
-	CreateAndInvite(ctx context.Context, arg User, token string, invitationExpiry time.Duration) error
+	Delete(ctx context.Context, userID int64) error
+	
+	// admin
+	Create(ctx context.Context, params User) (int64, error)
+
+	// user
+	CreateAndInvite(ctx context.Context, params User, token string, invitationExpiry time.Duration) error
 	Activate(ctx context.Context, token string) error
-	ModPassword(ctx context.Context, arg User) error
+	ModPassword(ctx context.Context, params User) error
 }
 
 type PostStore interface {
-	GetOne(ctx context.Context, id int64) (*Post, error)
+	// GetOne(ctx context.Context, postID int64) (*Post, error)
+	// Create(ctx context.Context, params Post) error
+	// Delete(ctx context.Context, postID int64) error
+	// Update(ctx context.Context, params Post) error
+	// GetUserFeed(ctx context.Context, userID int64, fq PaginatedFeedQuery) ([]PostWithMetadata, error)
 }
 
 type CommentStore interface {
-	GetOne(ctx context.Context, id int64) (*Comment, error)
+	Create(ctx context.Context, params Comment) error
+	GetByPostID(ctx context.Context, postID int64) ([]*Comment, error)
 }
 
 type PlanStore interface {
 	GetAll(ctx context.Context) ([]*Plan, error)
-	GetOne(ctx context.Context, id int64) (*Plan, error)
-	SubscribeUserToPlan(ctx context.Context, arg User) error
+	GetOne(ctx context.Context, planID int64) (*Plan, error)
+	SubscribeUserToPlan(ctx context.Context, params User) error
 }
 
-// 关注
 type FollowerStore interface {
 	Follow(ctx context.Context, userID, followerID int64) error
 	Unfollow(ctx context.Context, followerID, userID int64) error

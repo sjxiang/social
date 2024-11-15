@@ -18,7 +18,7 @@ func TestFollowed(t *testing.T) {
 	}
 	defer db.Close()
 
-	followStore := newFollowStoreImpl(db)
+	followStore := newFollowStore(db)
 
 
 	tests := []struct {
@@ -63,7 +63,7 @@ func TestUnfollowed(t *testing.T) {
 	}
 	defer db.Close()
 
-	followStore := newFollowStoreImpl(db)
+	followStore := newFollowStore(db)
 
 
 	tests := []struct {
@@ -107,7 +107,7 @@ func TestGetAllFollowed(t *testing.T) {
 	}
 	defer db.Close()
 
-	followStore := newFollowStoreImpl(db)
+	followStore := newFollowStore(db)
 	
 	followers, err := followStore.GetAllFollowed(context.TODO(), 1000)
 	if err != nil {
@@ -135,7 +135,7 @@ func TestGetAllFollowedCount(t *testing.T) {
 	}
 	defer db.Close()
 
-	followStore := newFollowStoreImpl(db)
+	followStore := newFollowStore(db)
 	
 	count, err := followStore.GetAllFollowedCount(context.TODO(), 1000)
 	if err != nil {
@@ -158,7 +158,7 @@ func TestGetAllFollower(t *testing.T) {
 	}
 	defer db.Close()
 
-	followStore := newFollowStoreImpl(db)
+	followStore := newFollowStore(db)
 	
 	followers, err := followStore.GetAllFollower(context.TODO(), 1000)
 	if err != nil {
@@ -178,14 +178,14 @@ func TestGetAllFollowerCount(t *testing.T) {
 	if testing.Short() {
 		t.Skip()
 	}
-	
+
 	db, err := initdb()
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer db.Close()
 
-	followStore := newFollowStoreImpl(db)
+	followStore := newFollowStore(db)
 	
 	count, err := followStore.GetAllFollowerCount(context.TODO(), 1001)
 	if err != nil {

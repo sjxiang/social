@@ -2,10 +2,13 @@ package validate
 
 import (
 	"testing"
+	"time"
 )
 
 
 func TestValidateParams(t *testing.T) {
+	t.Log(time.DateTime)
+
 	var params struct {
 		Email    string `json:"email"    validate:"required,email"`
 		Password string `json:"password" validate:"required,min=8,max=32"` 

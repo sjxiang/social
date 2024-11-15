@@ -71,6 +71,8 @@ func (fq PaginatedFeedQuery) Parse(r *http.Request) (PaginatedFeedQuery, error) 
 }
 
 func parseTime(s string) string {
+	// layout, time.DateTime == 2006-01-02 15:04:05
+	
 	t, err := time.Parse(time.DateTime, s)
 	if err != nil {
 		return ""

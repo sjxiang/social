@@ -1,8 +1,10 @@
 package store
 
 import (
-	"time"
+	"context"
+	"database/sql"
 	"fmt"
+	"time"
 )
 
 // 会员订阅计划
@@ -40,5 +42,118 @@ func (p *Plan) PlanNameForDisplay() string {
 
 func (p *Plan) ForDisplay() (string, string) {
 	return p.PlanNameForDisplay(), p.AmountForDisplay()
+}
+
+
+type PlanStoreImpl struct {
+	db *sql.DB
+}
+
+func newPlanStore(db *sql.DB) PlanStore {
+	return &PlanStoreImpl{db: db}
+}
+
+func (p *PlanStoreImpl) GetAll(ctx context.Context) ([]*Plan, error) {
+	query := `
+		select id, plan_name, plan_amount, created_at, updated_at
+		from plans 
+		order by id
+	`
+
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
+	rows, err := p.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+
+	var plans []*Plan
+
+	for rows.Next() {
+	
+		var i Plan
+
+		err := rows.Scan(
+			&i.ID,
+			&i.PlanName,
+			&i.PlanAmount,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		)
+		i.PlanName, i.PlanAmountFormatted = i.ForDisplay()
+		
+		if err != nil {
+			return nil, err
+		}
+
+		plans = append(plans, &i)
+	}
+
+	return plans, nil
+}
+
+
+func (p *PlanStoreImpl) GetOne(ctx context.Context, planID int64) (*Plan, error) {
+	query := `
+		select id, plan_name, plan_amount, created_at, updated_at 
+		from plans 
+		where id = ?
+	`
+
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
+	var i Plan
+	row := p.db.QueryRowContext(ctx, query, planID)
+
+	err := row.Scan(
+		&i.ID,
+		&i.PlanName,
+		&i.PlanAmount,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	i.PlanName, i.PlanAmountFormatted = i.ForDisplay()
+
+	return &i, nil
+}
+
+// 订阅
+func (p *PlanStoreImpl) SubscribeUserToPlan(ctx context.Context, params User) error {
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
+	// 取消用户的所有订阅
+	stmt := `delete from user_plans where user_id = ?`	
+	
+	_, err := p.db.ExecContext(ctx, stmt, params.ID)
+	if err != nil {
+		return err
+	}
+
+	// 创建新的订阅
+	stmt = `
+		insert into user_plans (user_id, plan_id, created_at, updated_at)
+		values (?, ?, ?, ?)
+	`
+
+	_, err = p.db.ExecContext(ctx, stmt, 
+		params.ID, 
+		params.Plan.ID, 
+		params.Plan.CreatedAt, 
+		params.Plan.UpdatedAt,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
