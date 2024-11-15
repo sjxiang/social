@@ -5,6 +5,44 @@ import (
 )
 
 
+// 会员订阅计划 subscription plans
+type Plan struct {
+	ID                  int       `json:"id"`
+	PlanName            string    `json:"plan_name"`
+	PlanAmount          int       `json:"plan_amount"`  // 金额, 单位: 元
+	PlanAmountFormatted string    `json:"plan_amount_formatted"`
+	CreatedAt           time.Time `json:"created_at"`
+	UpdatedAt           time.Time `json:"updated_at"`
+}
+
+// 格式化为货币字符串
+func (p *Plan) AmountForDisplay() string {
+	return fmt.Sprintf("¥%d", p.PlanAmount)
+}
+
+
+func (p *Plan) PlanNameForDisplay() string {
+	planName := p.PlanName
+
+	if planName == "free" {
+		return "免费"
+	} else if planName == "basic" {
+		return "基础"
+	} else if planName == "pro" {
+		return "专业"
+	} else if planName == "enterprise" {
+		return "企业"
+	} else {
+		return "未知"
+	}
+}
+
+func (p *Plan) ForDisplay() (string, string) {
+	return p.PlanNameForDisplay(), p.AmountForDisplay()
+}
+
+
+
 func (m *MySQLPlanStore) GetAll(ctx context.Context) ([]*Plan, error) {
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
 	defer cancel()

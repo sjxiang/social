@@ -36,12 +36,6 @@ CREATE TABLE `plans` (
     UNIQUE KEY `idx_plan_name` (`plan_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='订阅计划表';
 
-INSERT INTO `plans` (`plan_name`, `plan_amount`) VALUES ('free', '0');
-INSERT INTO `plans` (`plan_name`, `plan_amount`) VALUES ('basic', '10');
-INSERT INTO `plans` (`plan_name`, `plan_amount`) VALUES ('pro', '100');
-INSERT INTO `plans` (`plan_name`, `plan_amount`) VALUES ('enterprise', '1000');
-
-
 
 -- 表 3
 DROP TABLE IF EXISTS `user_plans`;
@@ -58,13 +52,12 @@ CREATE TABLE `user_plans` (
 
 
 -- 表 4
--- 多个帖子可以是同一个用户发的
 DROP TABLE IF EXISTS `posts`;
 
 CREATE TABLE `posts` (
     `id`                  bigint(20) unsigned NOT NULL AUTO_INCREMENT,
     `title`               varchar(255)        NOT NULL COMMENT '帖子标题',
-    `user_id`             bigint(20)          NOT NULL COMMENT '阿婆主的用户id',
+    `user_id`             bigint(20)          NOT NULL COMMENT '作者的用户id',
     `content`             varchar(1024)       NOT NULL DEFAULT '' COMMENT '帖子内容',
     `tags`                varchar(100)        NOT NULL DEFAULT '' COMMENT '标签',
     `created_at`          timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -73,36 +66,41 @@ CREATE TABLE `posts` (
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='帖子表';
 
+-- 掘金小册专栏, 连载 
+
 
 -- 表 5
--- 一个帖子可以有多个评论
 DROP TABLE IF EXISTS `comments`;
 
 CREATE TABLE `comments` (
     `id`                  bigint(20) unsigned NOT NULL AUTO_INCREMENT,
     `post_id`             bigint(20)          NOT NULL COMMENT '帖子id',
-    `user_id`             bigint(20)          NOT NULL COMMENT '阿婆主的用户id',
+    `user_id`             bigint(20)          NOT NULL COMMENT '评论者的用户id',
     `content`             varchar(1024)       NOT NULL COMMENT '评论内容',
     `created_at`          timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='评论表';
 
+-- 针对特朗普当选的新闻稿, 一口气喷了 30 楼 
+
 
 -- 表 6
--- 一个阿婆主可以有多个粉丝
 DROP TABLE IF EXISTS `followers`;
 
 CREATE TABLE `followers` (
     `id`                  bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    `user_id`             bigint(20)          NOT NULL COMMENT '阿婆主的用户id',
-    `follower_uid`        bigint(20)          NOT NULL COMMENT '粉丝的用户id',
+    `user_id`             bigint(20)          NOT NULL COMMENT '用户id',
+    `follower_id`        bigint(20)          NOT NULL COMMENT '阿婆主的用户id',
     `created_at`          timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='关注表';
+    PRIMARY KEY (`id`),
+    CONSTRAINT unique_follow UNIQUE (user_id, follower_id)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='粉丝表';
+
+-- 例, 我关注了峰哥亡命天涯、马督工 ...
+
 
 
 -- 表 7
--- 一个用户可以有多个邀请码
 DROP TABLE IF EXISTS `user_invitations`;
 
 CREATE TABLE `user_invitations` (
@@ -111,5 +109,6 @@ CREATE TABLE `user_invitations` (
     `token`               VARCHAR(64)         NOT NULL COMMENT '邀请码',
     `expiry`              timestamp           NOT NULL COMMENT '过期时间',
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=167 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='邀请表';
+) ENGINE=InnoDB AUTO_INCREMENT=167 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户激活码';
 
+-- 注册完之后, 会给你提交的邮箱发激活码

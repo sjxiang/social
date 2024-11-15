@@ -4,7 +4,7 @@ import (
 	"github.com/sjxiang/social/internal/auth"
 	"github.com/sjxiang/social/internal/config"
 	"github.com/sjxiang/social/internal/logger"
-	"github.com/sjxiang/social/internal/mail"
+	"github.com/sjxiang/social/internal/mailer"
 	"github.com/sjxiang/social/internal/ratelimiter"
 	"github.com/sjxiang/social/internal/token"
 	"github.com/sjxiang/social/internal/utils"
@@ -49,7 +49,7 @@ func main() {
 	)
 	
 	// Mailer
-	sender := mail.NewQQmailSender("no-reply", cfg.Mail.FromEmail, cfg.Mail.ApiKey)
+	sender := mailer.NewQQmailSender("no-reply", cfg.Mail.FromEmail, cfg.Mail.ApiKey)
 	
 	// Authenticator
 	jwtAuthenticator := auth.NewJWTAuthenticator(

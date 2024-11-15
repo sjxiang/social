@@ -19,7 +19,7 @@ redis-container-console:
 
 test:
 	@echo "跑一遍测试"
-	go test -short -v ./...
+	go test -count=1 -short -v ./...
 
 
 .PHONY: run mysql-container-console redis-container-console

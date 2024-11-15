@@ -11,17 +11,17 @@ type ctxKey string
 
 
 const (
-	ctxKeyUser ctxKey = "user"
-	ctxKeyRole ctxKey = "role"
-	ctxKeyPost ctxKey = "post"
+	userKey ctxKey = "user"
+	RoleKey ctxKey = "role"
+	PostKey ctxKey = "post"
 )
 
 // 从请求中获取用户
-func getUserFromContext(r *http.Request) (data.User, error) {
-	v, ok := r.Context().Value(ctxKeyUser).(data.User)
+func getUserFromContext(r *http.Request) (*data.User, error) {
+	v, ok := r.Context().Value(userKey).(*data.User)
 
 	if !ok {
-		return data.User{}, fmt.Errorf("user not found")  // 类型断言失败
+		return nil, fmt.Errorf("user not found")  // 类型断言失败
 	}
 
 	return v, nil 

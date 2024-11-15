@@ -16,8 +16,8 @@ import (
 
 	"github.com/sjxiang/social/internal/auth"
 	"github.com/sjxiang/social/internal/config"
-	"github.com/sjxiang/social/internal/data"
-	"github.com/sjxiang/social/internal/mail"
+	"github.com/sjxiang/social/internal/store"
+	"github.com/sjxiang/social/internal/mailer"
 	"github.com/sjxiang/social/internal/ratelimiter"
 	"github.com/sjxiang/social/internal/token"
 )
@@ -26,9 +26,9 @@ import (
 type application struct {
 	logger        *zap.SugaredLogger
 	config        config.Config
-	store         data.MySQLStorage
+	store         store.Storage
 	rateLimiter   ratelimiter.Limiter
-	mailer        mail.EmailSender
+	mailer        mailer.EmailSender
 	auth          auth.Authenticator
 	tokenMaker    token.Maker
 }

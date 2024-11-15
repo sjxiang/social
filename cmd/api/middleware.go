@@ -51,7 +51,7 @@ func (app *application) AuthTokenMiddleware(next http.Handler) http.Handler {
 		}
 		
 		// 将用户信息放入上下文中
-		ctx = context.WithValue(ctx, ctxKeyUser, user)
+		ctx = context.WithValue(ctx, userKey, user)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

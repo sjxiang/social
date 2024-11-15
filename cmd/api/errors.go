@@ -4,7 +4,9 @@ import (
 	"net/http"
 )
 
-// 500
+// 500 
+// 服务器开小差啦, 稍后再来试一试 
+// 数据库繁忙, 请稍后再试
 func (app *application) internalServerError(w http.ResponseWriter, r *http.Request, err error) {
 	app.logger.Errorw("internal error", "method", r.Method, "path", r.URL.Path, "error", err.Error())
 
