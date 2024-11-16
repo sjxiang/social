@@ -65,10 +65,21 @@ func (f *FollowertoreImpl) Unfollow(ctx context.Context, followerID, userID int6
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
 	defer cancel()
 
-	// todo, 多次取关, 提示 `已经取关了`
+	result, err := f.db.ExecContext(ctx, stmt, userID, followerID)
+	if err != nil {
+		return err
+	}
 
-	_, err := f.db.ExecContext(ctx, stmt, userID, followerID)
-	return err
+	rowsAffected, err:= result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return ErrNotFound
+	}
+
+	return nil 
 }
 
 

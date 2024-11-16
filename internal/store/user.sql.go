@@ -156,7 +156,7 @@ func (u *UserStoreImpl) GetByEmail(ctx context.Context, email string) (*User, er
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return &i, ErrNotFound
+			return nil, ErrNotFound
 		} else {
 			return nil, err 
 		}
@@ -177,6 +177,7 @@ func (u *UserStoreImpl) GetByEmail(ctx context.Context, email string) (*User, er
 		&i.Plan.UpdatedAt,
 	)
 	if err != nil {
+		// 订阅记录没查到, 但还有用户记录
 		if errors.Is(err, sql.ErrNoRows) {
 			return &i, nil
 		} else {

@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 )
@@ -117,7 +118,11 @@ func (p *PlanStoreImpl) GetOne(ctx context.Context, planID int64) (*Plan, error)
 		&i.UpdatedAt,
 	)
 	if err != nil {
-		return nil, err
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		} else {
+			return nil, err
+		}
 	}
 
 	i.PlanName, i.PlanAmountFormatted = i.ForDisplay()
@@ -137,6 +142,9 @@ func (p *PlanStoreImpl) SubscribeUserToPlan(ctx context.Context, params User) er
 	if err != nil {
 		return err
 	}
+
+	// 如果以前没有订阅, 没有影响 rowsAffected == 0 嘛
+
 
 	// 创建新的订阅
 	stmt = `
