@@ -4,7 +4,7 @@ import (
     "testing"
 )
 
-func Tests(t *testing.T) {
+func TestParseTime(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    string

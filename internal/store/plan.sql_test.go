@@ -26,11 +26,15 @@ func TestGetAllPlans(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for _, item := range items {
-		t.Log(item)
+	if len(items) > 0 {
+		for _, item := range items {
+			t.Log(item)
+		}
+	
+		t.Log("获取全部的订阅计划, ok")
 	}
 
-	t.Log("获取全部的订阅计划, ok")
+	t.Log("订阅计划为空")
 }
 
 

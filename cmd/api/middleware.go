@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/sjxiang/social/internal/data"
+	"github.com/sjxiang/social/internal/store"
 	"github.com/sjxiang/social/internal/token"
 )
 
@@ -100,7 +100,7 @@ func (app *application) BasicAuthMiddleware() func(http.Handler) http.Handler {
 
 
 // 检查权限 Per, 例 'Authorize'
-func (app *application) checkRolePrecedence(ctx context.Context, user *data.User, roleName string) (bool, error) {
+func (app *application) checkRolePrecedence(ctx context.Context, user *store.User, roleName string) (bool, error) {
 	return true, nil
 
 	// role, err := app.store.Role.GetByName(ctx, roleName)

@@ -67,28 +67,22 @@ func (c *CommentStoreImpl) GetByPostID(ctx context.Context, postID int64) ([]*Co
 }
 
 func (c *CommentStoreImpl) Create(ctx context.Context, params Comment) error {
-	// query := `
-	// 	INSERT INTO comments (post_id, user_id, content)
-	// 	VALUES ($1, $2, $3)
-	// 	RETURNING id, created_at
-	// `
+	query := `
+		insert into comments (post_id, user_id, content, created_at)
+		values (?, ?, ?, ?)
+	`
 
-	// ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
-	// defer cancel()
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
 
-	// err := s.db.QueryRowContext(
-	// 	ctx,
-	// 	query,
-	// 	comment.PostID,
-	// 	comment.UserID,
-	// 	comment.Content,
-	// ).Scan(
-	// 	&comment.ID,
-	// 	&comment.CreatedAt,
-	// )
-	// if err != nil {
-	// 	return err
-	// }
+	_, err := c.db.ExecContext(
+		ctx,
+		query,
+		params.PostID,
+		params.UserID,
+		params.Content,
+		params.CreatedAt,
+	)
 
-	return nil
+	return err
 }

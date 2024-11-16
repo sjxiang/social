@@ -23,19 +23,20 @@ type Storage struct {
 func NewStorage(db *sql.DB) Storage {
 	return Storage{
 		Users:     newUserStore(db),
-		Plans:     nil,
+		Plans:     newPlanStore(db),
 		Followers: newFollowStore(db),
-		Posts:     nil,
+		Posts:     newPostStore(db),
 		Comments:  newCommentStore(db),
 	}
 }
-
 
 
 type UserStore interface {
 	GetOne(ctx context.Context, userID int64) (*User, error)
 	Exists(ctx context.Context, userID int64) (bool, error)
 	GetByEmail(ctx context.Context, email string) (*User, error)
+
+	// admin
 	Delete(ctx context.Context, userID int64) error
 	
 	// admin
@@ -69,8 +70,14 @@ type PlanStore interface {
 type FollowerStore interface {
 	Follow(ctx context.Context, userID, followerID int64) error
 	Unfollow(ctx context.Context, followerID, userID int64) error
-	GetAllFollowed(ctx context.Context, userID int64) ([]*Follower, error)
+	GetAllFollowed(ctx context.Context, userID int64) ([]*Follower, error)  
 	GetAllFollowedCount(ctx context.Context, userID int64) (int64, error)
 	GetAllFollower(ctx context.Context, userID int64) ([]*Follower, error) 
 	GetAllFollowerCount(ctx context.Context, userID int64) (int64, error)
+}
+
+
+// todo
+type MySQLRepo interface {
+
 }

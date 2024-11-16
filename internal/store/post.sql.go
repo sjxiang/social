@@ -32,10 +32,10 @@ func newPostStore(db *sql.DB) PostStore {
 	return &PostStoreImpl{db: db}
 }
 
-func (s *PostStoreImpl) GetUserFeed(ctx context.Context, userID int64, fq PaginatedFeedQuery) ([]PostWithMetadata, error) {
+// func (s *PostStoreImpl) GetUserFeed(ctx context.Context, userID int64, fq PaginatedFeedQuery) ([]PostWithMetadata, error) {
 
-	return nil, nil
-}
+// 	return nil, nil
+// }
 
 // 	query := `
 // 		SELECT 
@@ -173,33 +173,72 @@ func (s *PostStoreImpl) GetUserFeed(ctx context.Context, userID int64, fq Pagina
 // 	return nil
 // }
 
-// func (s *PostStore) Update(ctx context.Context, post *Post) error {
-// 	query := `
-// 		UPDATE posts
-// 		SET title = $1, content = $2, version = version + 1
-// 		WHERE id = $3 AND version = $4
-// 		RETURNING version
-// 	`
 
-// 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
-// 	defer cancel()
+func (p *PostStoreImpl)	GetOne(ctx context.Context, postID int64) (*Post, error) {
+	return nil, nil 
+}
 
-// 	err := s.db.QueryRowContext(
-// 		ctx,
-// 		query,
-// 		post.Title,
-// 		post.Content,
-// 		post.ID,
-// 		post.Version,
-// 	).Scan(&post.Version)
-// 	if err != nil {
-// 		switch {
-// 		case errors.Is(err, sql.ErrNoRows):
-// 			return ErrNotFound
-// 		default:
-// 			return err
-// 		}
-// 	}
+func (p *PostStoreImpl) Create(ctx context.Context, params Post) error {
+	return nil 
+}
 
-// 	return nil
-// }
+func (p *PostStoreImpl) Delete(ctx context.Context, postID int64) error {
+	stmt := `
+		delete from posts where id = ?
+	`
+
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
+	result, err := p.db.ExecContext(ctx, stmt, postID)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return ErrNotFound
+	}
+	
+	return nil 
+}
+
+func (p *PostStoreImpl) Update(ctx context.Context, params Post) error {
+	stmt := `
+		update posts
+		set title = ?, content = ?, version = version + 1, updated_at = ?
+		where id = ? and version = ?
+	`
+
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
+	result, err := p.db.ExecContext(ctx, stmt, 
+		params.Title, 
+		params.Content, 
+		params.UpdatedAt, 
+		params.ID, 
+		params.Version)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return ErrNotFound
+	}
+
+	return nil 
+}
+
+func (p *PostStoreImpl) GetUserFeed(ctx context.Context, userID int64, fq PaginatedFeedQuery) ([]PostWithMetadata, error) {
+	return nil, nil 
+}

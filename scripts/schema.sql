@@ -67,7 +67,7 @@ CREATE TABLE `posts` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='帖子表';
 
 -- 掘金小册专栏, 连载 
-
+INSERT INTO `posts` (`title`, `content`, `user_id`, `tags`, `created_At`, `version`) VALUES ("vue", "more ...", 7, "fe, interview", UTC_TIMESTAMP(), 0);
 
 -- 表 5
 DROP TABLE IF EXISTS `comments`;
@@ -90,7 +90,7 @@ DROP TABLE IF EXISTS `followers`;
 CREATE TABLE `followers` (
     `id`                  bigint(20) unsigned NOT NULL AUTO_INCREMENT,
     `user_id`             bigint(20)          NOT NULL COMMENT '用户id',
-    `follower_id`        bigint(20)          NOT NULL COMMENT '阿婆主的用户id',
+    `follower_id`         bigint(20)          NOT NULL COMMENT '阿婆主的用户id',
     `created_at`          timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     CONSTRAINT unique_follow UNIQUE (user_id, follower_id)

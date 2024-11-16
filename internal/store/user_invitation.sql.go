@@ -39,6 +39,7 @@ func (u *UserStoreImpl) Activate(ctx context.Context, token string) error {
 
 		// 2. 更改用户状态
 		user.IsActive = true
+		
 		if err := u.update(ctx, tx, user); err != nil {
 			return err
 		}
@@ -63,8 +64,20 @@ func (u *UserStoreImpl) deleteUserInvitations(ctx context.Context, tx *sql.Tx, u
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
 	defer cancel()
 	
-	_, err := tx.ExecContext(ctx, stmt, userID)
-	return err
+	result, err := tx.ExecContext(ctx, stmt, userID)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err 
+	}
+	if rowsAffected == 0 {
+		return ErrNotFound
+	}
+
+	return nil 
 }
 
 // 创建激活码
@@ -95,7 +108,7 @@ func (u *UserStoreImpl) findUserByToken(ctx context.Context, tx *sql.Tx, token s
 	defer cancel()
 
 	var i User
-	row := u.db.QueryRowContext(ctx, query, token, time.Now())
+	row := tx.QueryRowContext(ctx, query, token, time.Now())
 
 	err := row.Scan(
 		&i.ID,

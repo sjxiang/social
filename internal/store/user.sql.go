@@ -197,10 +197,23 @@ func (u *UserStoreImpl) delete(ctx context.Context, tx *sql.Tx, userID int64) er
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
 	defer cancel()
 
-	_, err := tx.ExecContext(ctx, stmt, userID)
-	return err
+	result, err := tx.ExecContext(ctx, stmt, userID)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err 
+	}
+	if rowsAffected == 0 {
+		return ErrNotFound
+	}
+
+	return nil 
 }
 
+// admin
 func (u *UserStoreImpl) Delete(ctx context.Context, userID int64) error {
 	return withTx(u.db, ctx, func(tx *sql.Tx) error {
 
@@ -209,6 +222,8 @@ func (u *UserStoreImpl) Delete(ctx context.Context, userID int64) error {
 			return err
 		}
 
+		// bug, 激活码用完就删了, 除非你没有激活
+		
 		// 删除用户激活码
 		if err := u.deleteUserInvitations(ctx, tx, userID); err != nil {
 			return err
@@ -261,12 +276,23 @@ func (u *UserStoreImpl) ModPassword(ctx context.Context, params User) error {
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
 	defer cancel()
 	
-	_, err := u.db.ExecContext(ctx, stmt,
+	result, err := u.db.ExecContext(ctx, stmt,
 		params.Password.hash,
 		params.ID,
 	)
+	if err != nil {
+		return err 
+	}
 
-	return err
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err 
+	}
+	if rowsAffected == 0 {
+		return ErrNotFound
+	}
+
+	return nil 
 }
 
 func (u *UserStoreImpl) create(ctx context.Context, tx *sql.Tx, params User) (int64, error) {
@@ -304,16 +330,20 @@ func (u *UserStoreImpl) create(ctx context.Context, tx *sql.Tx, params User) (in
 }
 
 
-func (u *UserStoreImpl) update(ctx context.Context, tx *sql.Tx, arg *User) error {
+func (u *UserStoreImpl) update(ctx context.Context, tx *sql.Tx, params *User) error {
 	stmt := `
 		update users 
-		set is_active = ?, updated_at = UTC_TIMESTAMP() 
+		set is_active = ?, updated_at = updated_at 
 		where id = ?
 	`
 
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
 	defer cancel()
 
-	_, err := tx.ExecContext(ctx, stmt, arg.IsActive, arg.ID)
+	_, err := tx.ExecContext(ctx, stmt, 
+		params.IsActive, 
+		params.UpdatedAt, 
+		params.ID,
+	)
 	return err
 }

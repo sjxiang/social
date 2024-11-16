@@ -14,7 +14,10 @@ var (
 
 /*
 
-ERROR 1062 (23000): Duplicate entry '1-2' for key 'followers.unique_follow'
+增, already exists
+	
+删改, 0 rows affected
 
+查, not found
 
  */

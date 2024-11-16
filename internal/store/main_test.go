@@ -11,7 +11,7 @@ import (
 func initdb() (*sql.DB, error) {
 	dsn := "root:my-secret-pw@tcp(127.0.0.1:13306)/social?charset=utf8&parseTime=True&loc=Local"
 
-	db, err := utils.NewMySQL(dsn, 30, 30, "15m")
+	db, err := utils.NewMySQL(dsn, 30, 30, time.Minute*15)
 	if err != nil {
 		return nil, err
 	}

@@ -46,7 +46,7 @@ type database struct {
 	MySQLDatabaseName  string
 	MySQLMaxIdleConns  int
 	MySQLMaxOpenConns  int
-	MySQLMaxIdleTime   string
+	MySQLMaxIdleTime   time.Duration
 	RedisHost          string
 	RedisPort          int
 	RedisPassword      string
@@ -85,7 +85,7 @@ func New() (Config, error) {
 		MySQLDatabaseName:  defaultEnvString("MYSQL_DATABASE_NAME", "social"),
 		MySQLMaxIdleConns:  defaultEnvNumeric("MYSQL_MAX_IDLE_CONNS", 30),
 		MySQLMaxOpenConns:  defaultEnvNumeric("MYSQL_MAX_OPEN_CONNS", 30),
-		MySQLMaxIdleTime:   defaultEnvString("MYSQL_MAX_IDLE_TIME", "15m"),
+		MySQLMaxIdleTime:   time.Minute * 15,
 		RedisHost:          defaultEnvString("REDIS_HOST", "localhost"),
 		RedisPort:          defaultEnvNumeric("REDIS_PORT", 16379),
 		RedisPassword:      defaultEnvString("REDIS_PASSWORD", ""),
