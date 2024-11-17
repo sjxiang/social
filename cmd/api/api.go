@@ -15,7 +15,6 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/sjxiang/social/internal/auth"
-	"github.com/sjxiang/social/internal/config"
 	"github.com/sjxiang/social/internal/store"
 	"github.com/sjxiang/social/internal/mailer"
 	"github.com/sjxiang/social/internal/ratelimiter"
@@ -25,7 +24,7 @@ import (
 
 type application struct {
 	logger        *zap.SugaredLogger
-	config        config.Config
+	config        config
 	db            store.Storage
 	rateLimiter   ratelimiter.Limiter
 	mailer        mailer.EmailSender
@@ -43,7 +42,7 @@ func (app *application) mount() http.Handler {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{app.config.Web.Addr},
+		AllowedOrigins:   []string{app.config.addr},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
@@ -52,7 +51,7 @@ func (app *application) mount() http.Handler {
 	}))
 	
 	// 限流
-	if app.config.RateLimit.Enabled {
+	if app.config.rateLimiter.Enabled {
 		r.Use(app.RateLimiterMiddleware)
 	}
 
@@ -71,7 +70,7 @@ func (app *application) run(mux http.Handler) error {
 	
 	// 创建一个 http server 实例
 	srv := &http.Server{
-		Addr:         app.config.Web.Addr,
+		Addr:         app.config.addr,
 		Handler:      mux,
 		WriteTimeout: time.Second * 30,
 		ReadTimeout:  time.Second * 10,
@@ -100,7 +99,7 @@ func (app *application) run(mux http.Handler) error {
 		shutdown <- srv.Shutdown(ctx)
 	}()
 
-	app.logger.Infow("server has started", "addr", app.config.Web.Addr, "env", app.config.Web.Env)
+	app.logger.Infow("server has started", "addr", app.config.addr, "env", app.config.env)
 
 	err := srv.ListenAndServe()
 	if !errors.Is(err, http.ErrServerClosed) {
@@ -112,7 +111,7 @@ func (app *application) run(mux http.Handler) error {
 		return err
 	}
 
-	app.logger.Infow("server has stopped", "addr", app.config.Web.Addr, "env", app.config.Web.Env)
+	app.logger.Infow("server has stopped", "addr", app.config.addr, "env", app.config.env)
 
 	return nil
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/sjxiang/social/internal/auth"
-	"github.com/sjxiang/social/internal/config"
 	"github.com/sjxiang/social/internal/logger"
 	"github.com/sjxiang/social/internal/mailer"
 	"github.com/sjxiang/social/internal/ratelimiter"
@@ -11,26 +10,23 @@ import (
 )
 
 
-const version = "1.1.0"
-
-
 func main() {
 		
 	logger := logger.Must("bbs")
 	defer logger.Sync()
 
 	// dotenv
-	cfg, err := config.New()
+	cfg, err := loadConfig()
 	if err != nil {
 		logger.Fatal(err)
 	}
 
 	// MySQL
 	db, err := utils.NewMySQL(
-		cfg.FormattedMySQLAddr(),
-		cfg.DB.MySQL.MaxOpenConns,
-		cfg.DB.MySQL.MaxIdleConns,
-		cfg.DB.MySQL.MaxIdleTime,
+		cfg.db.addr,
+		cfg.db.maxOpenConns,
+		cfg.db.maxIdleConns,
+		cfg.db.maxIdleTime,
 	)
 	if err!= nil {
 		logger.Fatal(err)
@@ -41,33 +37,33 @@ func main() {
 
 
 	// Redis
-	if cfg.DB.Redis.Enabled {
+	if cfg.redis.enabled {
 		logger.Fatal("未配置缓存")
 	}
 
 	// Rate limiter
 	fixedWindowLimiter := ratelimiter.NewFixedWindowLimiter(
-		cfg.RateLimit.RequestsPerTimeFrame, 
-		cfg.RateLimit.TimeFrame,
+		cfg.rateLimiter.RequestsPerTimeFrame, 
+		cfg.rateLimiter.TimeFrame,
 	)
 	
 	// Mailer
 	sender := mailer.NewQQmailSender(
 		"no-reply", 
-		cfg.Mail.FromEmail, 
-		cfg.Mail.ApiKey,
+		cfg.mail.fromEmail, 
+		cfg.mail.sendGrid.apiKey,
 	)
 	
 	// Authenticator
 	jwtAuthenticator := auth.NewJWTAuthenticator(
-		cfg.Auth.JWT.SecretKey, 
-		cfg.Auth.JWT.Issuer,
+		cfg.auth.jwt.secretKey, 
+		cfg.auth.jwt.issuer,
 	)
 
 	// Token Maker
 	tokenMaker := token.NewJWTMaker(
-		cfg.Auth.JWT.SecretKey, 
-		cfg.Auth.JWT.Issuer,
+		cfg.auth.jwt.secretKey, 
+		cfg.auth.jwt.issuer,
 	)
 
 	app := &application{

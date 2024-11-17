@@ -42,7 +42,7 @@ func (app *application) AuthTokenMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		
+
 		ctx := r.Context()
 		user, err := app.db.UserStore.GetByEmail(ctx, payload.Email)
 		if err != nil {
@@ -84,8 +84,8 @@ func (app *application) BasicAuthMiddleware() func(http.Handler) http.Handler {
 			}
 
 			// check the credentials
-			username := app.config.Auth.Basic.Username
-			password := app.config.Auth.Basic.Password
+			username := app.config.auth.basic.user
+			password := app.config.auth.basic.pass
 
 			creds := strings.SplitN(string(decoded), ":", 2)
 			if len(creds) != 2 || creds[0] != username || creds[1] != password {
