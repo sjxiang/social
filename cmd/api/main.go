@@ -29,9 +29,9 @@ func main() {
 	// MySQL
 	db, err := utils.NewMySQL(
 		cfg.FormattedMySQLAddr(),
-		cfg.Database.MySQLMaxOpenConns,
-		cfg.Database.MySQLMaxIdleConns,
-		cfg.Database.MySQLMaxIdleTime,
+		cfg.DB.MySQLMaxOpenConns,
+		cfg.DB.MySQLMaxIdleConns,
+		cfg.DB.MySQLMaxIdleTime,
 	)
 	if err!= nil {
 		logger.Fatal(err)

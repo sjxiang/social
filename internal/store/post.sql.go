@@ -31,10 +31,6 @@ type PostStoreImpl struct {
 	db *sql.DB
 }
 
-func newPostStore(db *sql.DB) PostStore {
-	return &PostStoreImpl{db: db}
-}
-
 
 func (p *PostStoreImpl)	GetOne(ctx context.Context, postID int64) (*Post, error) {
 	query := `

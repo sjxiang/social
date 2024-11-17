@@ -50,10 +50,6 @@ type PlanStoreImpl struct {
 	db *sql.DB
 }
 
-func newPlanStore(db *sql.DB) PlanStore {
-	return &PlanStoreImpl{db: db}
-}
-
 func (p *PlanStoreImpl) GetAll(ctx context.Context) ([]*Plan, error) {
 	query := `
 		select id, plan_name, plan_amount, created_at, updated_at

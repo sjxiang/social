@@ -23,11 +23,6 @@ type FollowertoreImpl struct {
 }
 
 
-func newFollowStore(db *sql.DB) FollowerStore {
-	return &FollowertoreImpl{db: db}
-}
-
-
 // 关注
 func (f *FollowertoreImpl) Follow(ctx context.Context, userID, followerID int64) error {
 	stmt := `

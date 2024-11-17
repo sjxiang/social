@@ -51,10 +51,6 @@ type UserStoreImpl struct {
 	db *sql.DB
 } 
 
-func newUserStore(db *sql.DB) UserStore {
-	return &UserStoreImpl{db: db}
-}
-
 
 func (u *UserStoreImpl) GetOne(ctx context.Context, userID int64) (*User, error) {
 	query := `

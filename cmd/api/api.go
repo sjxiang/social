@@ -26,7 +26,7 @@ import (
 type application struct {
 	logger        *zap.SugaredLogger
 	config        config.Config
-	store         store.Storage
+	db            store.Storage
 	rateLimiter   ratelimiter.Limiter
 	mailer        mailer.EmailSender
 	auth          auth.Authenticator

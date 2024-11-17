@@ -18,7 +18,7 @@ func TestGetCommentByPostID(t *testing.T) {
 	}
 	defer db.Close()
 
-	commentStore := newCommentStore(db)
+	commentStore := &CommentStoreImpl{db}
 	
 	comments, err := commentStore.GetByPostID(context.Background(), 3)
 	if err != nil {
@@ -45,7 +45,8 @@ func TestCreateComment(t *testing.T) {
 	}
 	defer db.Close()
 
-	commentStore := newCommentStore(db)
+	commentStore := &CommentStoreImpl{db}
+
 	if err := commentStore.Create(context.TODO(), Comment{
 		PostID: 3,
 		UserID: 8,

@@ -44,7 +44,7 @@ func (app *application) AuthTokenMiddleware(next http.Handler) http.Handler {
 
 		ctx := r.Context()
 
-		user, err := app.store.Users.GetByEmail(ctx, payload.Email)
+		user, err := app.db.UserStore.GetByEmail(ctx, payload.Email)
 		if err != nil {
 			app.unauthorizedErrorResponse(w, r, err)
 			return

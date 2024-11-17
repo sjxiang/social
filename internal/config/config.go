@@ -1,19 +1,21 @@
 package config
 
 import (
-	"time"
 	"fmt"
+	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 )
 
+
 // 配置
 type Config struct {
 	Web       web
+	Auth      auth
+	DB        database
 	RateLimit rateLimit
 	Mail      mail
-	Auth      auth
-	Database  database
 }
 
 type web struct {
@@ -39,18 +41,19 @@ type jwt struct {
 }
 
 type database struct {
-	MySQLHost          string
-	MySQLPort          int
-	MySQLUser          string
-	MySQLPassword      string
-	MySQLDatabaseName  string
+	MySQLHost          string 
+	MySQLPort          string 
+	MySQLUser          string 
+	MySQLPassword      string 
+	MySQLDatabase      string 
 	MySQLMaxIdleConns  int
 	MySQLMaxOpenConns  int
 	MySQLMaxIdleTime   time.Duration
-	RedisHost          string
-	RedisPort          int
-	RedisPassword      string
-	RedisDatabase      int
+	// cache config
+	RedisHost          string 
+	RedisPort          string 
+	RedisPassword      string 
+	RedisDatabase      int    
 	RedisEnabled       bool
 }
 
@@ -76,69 +79,81 @@ func New() (Config, error) {
 	if err := godotenv.Load(); err != nil {
 		return cfg, err
 	}
-	
-	cfg.Database = database{
-		MySQLHost:          defaultEnvString("MYSQL_HOST", "localhost"),
-		MySQLPort:          defaultEnvNumeric("MYSQL_PORT", 13306),
-		MySQLUser:          defaultEnvString("MYSQL_USER", "root"),
-		MySQLPassword:      defaultEnvString("MYSQL_PASSWORD", "my-secret-pw"),
-		MySQLDatabaseName:  defaultEnvString("MYSQL_DATABASE_NAME", "social"),
-		MySQLMaxIdleConns:  defaultEnvNumeric("MYSQL_MAX_IDLE_CONNS", 30),
-		MySQLMaxOpenConns:  defaultEnvNumeric("MYSQL_MAX_OPEN_CONNS", 30),
+
+	cfg.Web = web{
+		Addr:   env("WEB_ADDR", ":8080"),
+		Env:    env("WEB_ENV", "Realese"),
+		ApiURL: env("API_URL", ":8080"),
+	}
+
+	cfg.DB = database{
+		MySQLHost:          env("MYSQL_HOST", "localhost"),
+		MySQLPort:          env("MYSQL_PORT", "13306"),
+		MySQLUser:          env("MYSQL_USER", "root"),
+		MySQLPassword:      env("MYSQL_PASSWORD", "my-secret-pw"),
+		MySQLDatabase:      env("MYSQL_DATABASE", "social"),
+		MySQLMaxIdleConns:  30,
+		MySQLMaxOpenConns:  30,
 		MySQLMaxIdleTime:   time.Minute * 15,
-		RedisHost:          defaultEnvString("REDIS_HOST", "localhost"),
-		RedisPort:          defaultEnvNumeric("REDIS_PORT", 16379),
-		RedisPassword:      defaultEnvString("REDIS_PASSWORD", ""),
-		RedisDatabase:      defaultEnvNumeric("REDIS_DATABASE", 0),
-		RedisEnabled:       defaultEnvBoolean("REDIS_ENABLED", false),  
+
+		RedisHost:      env("REDIS_HOST", "localhost"),
+		RedisPort:      env("REDIS_PORT", "16379"),
+		RedisPassword:  env("REDIS_PASSWORD", ""),
+		RedisDatabase:  0,
+		RedisEnabled:   false,  
 	}
 	
 	cfg.Auth = auth{
 		Basic: basic{
-			Username:  defaultEnvString("BASIC_AUTH_USERNAME", "admin"),
-			Password:  defaultEnvString("BASIC_AUTH_PASSWORD", "123456"),
+			Username:  env("BASIC_AUTH_USERNAME", "admin"),
+			Password:  env("BASIC_AUTH_PASSWORD", "123456"),
 		},
 		JWT: jwt{
-			SecretKey: defaultEnvString("JWT_SECRET_KEY", "8xEMrWkBARcDDYQ"),
-			Issuer:    defaultEnvString("JWT_ISSUER", "gua@vip.cn"),
+			SecretKey: env("JWT_SECRET_KEY", "8xEMrWkBARcDDYQ"),
+			Issuer:    env("JWT_ISSUER", "gua@vip.cn"),
 			Expiry:    time.Hour * 24 * 7,
 		},
 	}
 
-	cfg.Web = web{
-		Addr:   defaultEnvString("WEB_ADDR", ":8080"),
-		Env:    defaultEnvString("WEB_ENV", "Realese"),
-		ApiURL: defaultEnvString("WEB_API_URL", "localhost:8080"),
-	}
-
 	cfg.Mail = mail{
-		FromEmail:  defaultEnvString("MAIL_FROM_EMAIL", "EMAIL"),
-		ApiKey:     defaultEnvString("MAIL_API_KEY", "API_KEY"),
+		FromEmail:  env("MAILER_FROM_EMAIL", "gua@vip.cn"),
+		ApiKey:     env("MAILER_API_KEY", "xxxooo"),
 		Expiry:     time.Minute * 30,
 	}
 
 	cfg.RateLimit = rateLimit{
-		RequestsPerTimeFrame: defaultEnvNumeric("RATE_LIMITER_REQUESTS_PER_TIME_FRAME", 20),
-		TimeFrame:            time.Minute,
-		Enabled:              defaultEnvBoolean("RATE_LIMITER_ENABLED", true),
+		RequestsPerTimeFrame: 20,
+		TimeFrame:            time.Minute * 1,
+		Enabled:              true,
 	}
 
 	return cfg, nil 
 }
 
-
 func (cfg *Config) FormattedMySQLAddr() string {
-	// "root:my-secret-pw@tcp(127.0.0.1:13306)/social?charset=utf8&parseTime=True&loc=Local"
-	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local", 
-			cfg.Database.MySQLUser, 
-			cfg.Database.MySQLPassword, 
-			cfg.Database.MySQLHost, 
-			cfg.Database.MySQLPort, 
-			cfg.Database.MySQLDatabaseName,)
+	
+	// 例, "root:my-secret-pw@tcp(127.0.0.1:13306)/social?charset=utf8&parseTime=True&loc=Local"
+	
+	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local", 
+			cfg.DB.MySQLUser, 
+			cfg.DB.MySQLPassword, 
+			cfg.DB.MySQLHost, 
+			cfg.DB.MySQLPort, 
+			cfg.DB.MySQLDatabase,
+		)
 }
 
 func (cfg *Config) FormattedRedisAddr() string {
-	// "localhost:16379"
-	return fmt.Sprintf("%s:%d", cfg.Database.RedisHost, cfg.Database.RedisPort)
+	// 例, "localhost:16379"
+	return fmt.Sprintf("%s:%s", cfg.DB.RedisHost, cfg.DB.RedisPort)
 }
 
+
+func env(key, fallbackValue string) string {
+	s, exists := os.LookupEnv(key)	
+	
+	if !exists {
+		return fallbackValue
+	} 
+	return s
+}

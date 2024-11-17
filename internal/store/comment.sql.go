@@ -20,10 +20,6 @@ type CommentStoreImpl struct {
 	db *sql.DB
 }
 
-func newCommentStore(db *sql.DB) CommentStore {
-	return &CommentStoreImpl{db: db}
-}
-
 
 func (c *CommentStoreImpl) GetByPostID(ctx context.Context, postID int64) ([]*Comment, error) {
 	query := `
