@@ -15,6 +15,7 @@ type config struct {
 	env         string
 	apiURL      string
 	version     string
+	useCaching  bool 
 	mail        mailConfig
 	auth        authConfig
 	redis       redisConfig
@@ -39,17 +40,16 @@ type jwtConfig struct {
 }
 
 type dbConfig struct {
-	addr         string
+	dsn          string
 	maxOpenConns int
 	maxIdleConns int
 	maxIdleTime  time.Duration
 }
 
 type redisConfig struct {
-	addr    string
-	pw      string
-	db      int
-	enabled bool
+	addr     string
+	pw       string
+	db       int
 }
 
 type mailConfig struct {
@@ -71,10 +71,11 @@ func loadConfig() (config, error) {
 	}
 
 	cfg := config{
-		addr:    "localhost:8080",
-		env:     "dev",
-		apiURL:  "localhost:8080",
-		version: "1.1.0",
+		addr:       "localhost:8080",
+		env:        "dev",
+		apiURL:     "localhost:8080",
+		version:    "1.1.0",
+		useCaching: false,
 	}
 
 	cfg.auth = authConfig{
@@ -90,17 +91,16 @@ func loadConfig() (config, error) {
 	}
 
 	cfg.db = dbConfig{
-		addr:         env("MYSQL_ADDR", ""),
+		dsn:         env("MYSQL_DSN", ""),
 		maxOpenConns: 30,
 		maxIdleConns: 30,
 		maxIdleTime:  time.Minute * 15,
 	}
 
 	cfg.redis = redisConfig{
-		addr:    "localhost:6379",
-		pw:      "",
-		db:      0,
-		enabled: false,
+		addr:     "localhost:6379",
+		pw:       "",
+		db:       0,
 	}
 
 	cfg.mail = mailConfig{

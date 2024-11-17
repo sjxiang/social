@@ -5,6 +5,7 @@ import (
 	"github.com/sjxiang/social/internal/logger"
 	"github.com/sjxiang/social/internal/mailer"
 	"github.com/sjxiang/social/internal/ratelimiter"
+	"github.com/sjxiang/social/internal/streamer"
 	"github.com/sjxiang/social/internal/token"
 	"github.com/sjxiang/social/internal/utils"
 )
@@ -23,7 +24,7 @@ func main() {
 
 	// MySQL
 	db, err := utils.NewMySQL(
-		cfg.db.addr,
+		cfg.db.dsn,
 		cfg.db.maxOpenConns,
 		cfg.db.maxIdleConns,
 		cfg.db.maxIdleTime,
@@ -33,13 +34,13 @@ func main() {
 	}
 
 	defer db.Close()
-	logger.Info("initializing database support")
-
 
 	// Redis
-	if cfg.redis.enabled {
+	if cfg.useCaching {
 		logger.Fatal("未配置缓存")
 	}
+
+	logger.Info("initializing database support")
 
 	// Rate limiter
 	fixedWindowLimiter := ratelimiter.NewFixedWindowLimiter(
@@ -66,6 +67,15 @@ func main() {
 		cfg.auth.jwt.issuer,
 	)
 
+	const numWorkers = 4
+	videoQueue := make(chan streamer.VideoProcessingJob, numWorkers)
+	defer close(videoQueue)
+
+	wp := streamer.New(videoQueue, numWorkers)
+	wp.Run()
+
+	
+	// app
 	app := &application{
 		config:        cfg,
 		mailer:        sender,
@@ -73,6 +83,7 @@ func main() {
 		tokenMaker:    tokenMaker,
 		auth:          jwtAuthenticator,
 		rateLimiter:   fixedWindowLimiter,
+		videoQueue:    videoQueue,
 	}
 
 	mux := app.mount()

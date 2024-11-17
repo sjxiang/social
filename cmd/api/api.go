@@ -15,9 +15,10 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/sjxiang/social/internal/auth"
-	"github.com/sjxiang/social/internal/store"
 	"github.com/sjxiang/social/internal/mailer"
 	"github.com/sjxiang/social/internal/ratelimiter"
+	"github.com/sjxiang/social/internal/store"
+	"github.com/sjxiang/social/internal/streamer"
 	"github.com/sjxiang/social/internal/token"
 )
 
@@ -30,6 +31,7 @@ type application struct {
 	mailer        mailer.EmailSender
 	auth          auth.Authenticator
 	tokenMaker    token.Maker
+	videoQueue    chan streamer.VideoProcessingJob
 }
 
 
@@ -42,7 +44,7 @@ func (app *application) mount() http.Handler {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{app.config.addr},
+		AllowedOrigins:   []string{"https://*", "https://*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
