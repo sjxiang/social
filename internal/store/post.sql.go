@@ -163,19 +163,35 @@ func (p *PostStoreImpl) Update(ctx context.Context, params Post) error {
 
 func (p *PostStoreImpl) GetUserFeed(ctx context.Context, userID int64, fq PaginatedFeedQuery) ([]PostWithMetadata, error) {
 	query := `
-	
+		SELECT 
+			p.id, p.user_id, p.title, p.content, p.created_at, p.version, p.tags,
+			u.username,
+			COUNT(c.id) AS comments_count 
+		FROM 
+			posts p
+			LEFT JOIN comments c ON c.post_id = p.id
+			LEFT JOIN users u ON p.user_id = u.id
+			JOIN followers f ON f.follower_id = p.user_id OR p.user_id = ?
+		WHERE 
+			(article.title LIKE %?% OR p.content LIKE %?%) 
+			AND f.user_id = ? 
+		GROUP BY 
+			p.id, u.username
+		ORDER BY 
+			p.created_at ?
+		LIMIT ?, ?
 	`
-	
+
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
 	defer cancel()
 
-	
 	rows, err := p.db.QueryContext(ctx, query, 
 		userID, 
+		fq.Search,
+		fq.Search,
+		fq.Sort,
 		fq.Limit, 
 		fq.Offset, 
-		fq.Search, 
-		// pq.Array(fq.Tags)
 	)
 	if err != nil {
 		return nil, err
@@ -185,6 +201,9 @@ func (p *PostStoreImpl) GetUserFeed(ctx context.Context, userID int64, fq Pagina
 
 
 	var feed []PostWithMetadata
+
+	// 特殊处理
+	var tags string
 
 	for rows.Next() {
 		var i PostWithMetadata
@@ -196,7 +215,7 @@ func (p *PostStoreImpl) GetUserFeed(ctx context.Context, userID int64, fq Pagina
 			&i.Post.Content,
 			&i.Post.CreatedAt,
 			&i.Post.Version,
-			// pq.Array(&p.Tags),
+			&tags,  // 暂代
 			&i.Post.User.Username,
 			&i.CommentsCount,
 		)
@@ -204,58 +223,12 @@ func (p *PostStoreImpl) GetUserFeed(ctx context.Context, userID int64, fq Pagina
 			return nil, err
 		}
 
+		// 特殊处理, 分割
+		i.Post.Tags = strings.Split(tags, ",")
+
+
 		feed = append(feed, i)
 	}
 
 	return feed, nil
 }
-
-// 	query := `
-// 		SELECT 
-// 			p.id, p.user_id, p.title, p.content, p.created_at, p.version, p.tags,
-// 			u.username,
-// 			COUNT(c.id) AS comments_count
-// 		FROM posts p
-// 		LEFT JOIN comments c ON c.post_id = p.id
-// 		LEFT JOIN users u ON p.user_id = u.id
-// 		JOIN followers f ON f.follower_id = p.user_id OR p.user_id = $1
-// 		WHERE 
-// 			f.user_id = $1 AND
-// 			(p.title ILIKE '%' || $4 || '%' OR p.content ILIKE '%' || $4 || '%') AND
-// 			(p.tags @> $5 OR $5 = '{}')
-// 		GROUP BY p.id, u.username
-// 		ORDER BY p.created_at ` + fq.Sort + `
-// 		LIMIT $2 OFFSET $3
-// 	`
-
-// 	rows, err := s.db.QueryContext(ctx, query, userID, fq.Limit, fq.Offset, fq.Search, pq.Array(fq.Tags))
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	defer rows.Close()
-
-// 	var feed []PostWithMetadata
-// 	for rows.Next() {
-// 		var p PostWithMetadata
-// 		err := rows.Scan(
-// 			&p.ID,
-// 			&p.UserID,
-// 			&p.Title,
-// 			&p.Content,
-// 			&p.CreatedAt,
-// 			&p.Version,
-// 			pq.Array(&p.Tags),
-// 			&p.User.Username,
-// 			&p.CommentsCount,
-// 		)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-
-// 		feed = append(feed, p)
-// 	}
-
-// 	return feed, nil
-// }
-

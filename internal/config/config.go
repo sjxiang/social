@@ -90,7 +90,7 @@ func New() (Config, error) {
 		RedisPort:          defaultEnvNumeric("REDIS_PORT", 16379),
 		RedisPassword:      defaultEnvString("REDIS_PASSWORD", ""),
 		RedisDatabase:      defaultEnvNumeric("REDIS_DATABASE", 0),
-		RedisEnabled:       defaultEnvBoolean("REDIS_ENABLED", false),
+		RedisEnabled:       defaultEnvBoolean("REDIS_ENABLED", false),  
 	}
 	
 	cfg.Auth = auth{

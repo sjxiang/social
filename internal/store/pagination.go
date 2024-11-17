@@ -42,7 +42,7 @@ func (fq PaginatedFeedQuery) Parse(r *http.Request) (PaginatedFeedQuery, error) 
 
 	sort := qs.Get("sort")
 	if sort != "" {
-		fq.Sort = sort
+		fq.Sort = sort  // DESC 降序, ASC 升序
 	}
 
 	tags := qs.Get("tags")
