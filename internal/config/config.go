@@ -41,22 +41,28 @@ type jwt struct {
 }
 
 type database struct {
-	MySQLHost          string 
-	MySQLPort          string 
-	MySQLUser          string 
-	MySQLPassword      string 
-	MySQLDatabase      string 
-	MySQLMaxIdleConns  int
-	MySQLMaxOpenConns  int
-	MySQLMaxIdleTime   time.Duration
-	// cache config
-	RedisHost          string 
-	RedisPort          string 
-	RedisPassword      string 
-	RedisDatabase      int    
-	RedisEnabled       bool
+	MySQL mysql
+	Redis redis
 }
 
+type mysql struct {
+	Host          string 
+	Port          string 
+	User          string 
+	Password      string 
+	Database      string 
+	MaxIdleConns  int
+	MaxOpenConns  int
+	MaxIdleTime   time.Duration
+}
+
+type redis struct {
+	Host       string 
+	Port       string 
+	Password   string 
+	Database   int    
+	Enabled    bool
+}
 
 type mail struct {
 	FromEmail  string
@@ -87,20 +93,23 @@ func New() (Config, error) {
 	}
 
 	cfg.DB = database{
-		MySQLHost:          env("MYSQL_HOST", "localhost"),
-		MySQLPort:          env("MYSQL_PORT", "13306"),
-		MySQLUser:          env("MYSQL_USER", "root"),
-		MySQLPassword:      env("MYSQL_PASSWORD", "my-secret-pw"),
-		MySQLDatabase:      env("MYSQL_DATABASE", "social"),
-		MySQLMaxIdleConns:  30,
-		MySQLMaxOpenConns:  30,
-		MySQLMaxIdleTime:   time.Minute * 15,
-
-		RedisHost:      env("REDIS_HOST", "localhost"),
-		RedisPort:      env("REDIS_PORT", "16379"),
-		RedisPassword:  env("REDIS_PASSWORD", ""),
-		RedisDatabase:  0,
-		RedisEnabled:   false,  
+		MySQL: mysql{
+			Host:          env("MYSQL_HOST", "localhost"),
+			Port:          env("MYSQL_PORT", "13306"),
+			User:          env("MYSQL_USER", "root"),
+			Password:      env("MYSQL_PASSWORD", "my-secret-pw"),
+			Database:      env("MYSQL_DATABASE", "social"),
+			MaxIdleConns:  30,
+			MaxOpenConns:  30,
+			MaxIdleTime:   time.Minute * 15,
+		},
+		Redis: redis{
+			Host:      env("REDIS_HOST", "localhost"),
+			Port:      env("REDIS_PORT", "16379"),
+			Password:  env("REDIS_PASSWORD", ""),
+			Database:  0,
+			Enabled:   false, 
+		}, 
 	}
 	
 	cfg.Auth = auth{
@@ -133,19 +142,19 @@ func New() (Config, error) {
 func (cfg *Config) FormattedMySQLAddr() string {
 	
 	// 例, "root:my-secret-pw@tcp(127.0.0.1:13306)/social?charset=utf8&parseTime=True&loc=Local"
-	
 	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local", 
-			cfg.DB.MySQLUser, 
-			cfg.DB.MySQLPassword, 
-			cfg.DB.MySQLHost, 
-			cfg.DB.MySQLPort, 
-			cfg.DB.MySQLDatabase,
+			cfg.DB.MySQL.User, 
+			cfg.DB.MySQL.Password, 
+			cfg.DB.MySQL.Host, 
+			cfg.DB.MySQL.Port, 
+			cfg.DB.MySQL.Database,
 		)
 }
 
 func (cfg *Config) FormattedRedisAddr() string {
+
 	// 例, "localhost:16379"
-	return fmt.Sprintf("%s:%s", cfg.DB.RedisHost, cfg.DB.RedisPort)
+	return fmt.Sprintf("%s:%s", cfg.DB.Redis.Host, cfg.DB.Redis.Port)
 }
 
 

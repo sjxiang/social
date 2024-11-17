@@ -42,8 +42,8 @@ func (app *application) AuthTokenMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
+		
 		ctx := r.Context()
-
 		user, err := app.db.UserStore.GetByEmail(ctx, payload.Email)
 		if err != nil {
 			app.unauthorizedErrorResponse(w, r, err)

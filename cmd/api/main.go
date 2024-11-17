@@ -13,10 +13,10 @@ import (
 
 const version = "1.1.0"
 
+
 func main() {
-	
-	
-	logger := logger.Must("社区")
+		
+	logger := logger.Must("bbs")
 	defer logger.Sync()
 
 	// dotenv
@@ -24,14 +24,13 @@ func main() {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	logger.Info("配置清单", cfg)
 
 	// MySQL
 	db, err := utils.NewMySQL(
 		cfg.FormattedMySQLAddr(),
-		cfg.DB.MySQLMaxOpenConns,
-		cfg.DB.MySQLMaxIdleConns,
-		cfg.DB.MySQLMaxIdleTime,
+		cfg.DB.MySQL.MaxOpenConns,
+		cfg.DB.MySQL.MaxIdleConns,
+		cfg.DB.MySQL.MaxIdleTime,
 	)
 	if err!= nil {
 		logger.Fatal(err)
@@ -40,7 +39,11 @@ func main() {
 	defer db.Close()
 	logger.Info("initializing database support")
 
+
 	// Redis
+	if cfg.DB.Redis.Enabled {
+		logger.Fatal("未配置缓存")
+	}
 
 	// Rate limiter
 	fixedWindowLimiter := ratelimiter.NewFixedWindowLimiter(
@@ -49,7 +52,11 @@ func main() {
 	)
 	
 	// Mailer
-	sender := mailer.NewQQmailSender("no-reply", cfg.Mail.FromEmail, cfg.Mail.ApiKey)
+	sender := mailer.NewQQmailSender(
+		"no-reply", 
+		cfg.Mail.FromEmail, 
+		cfg.Mail.ApiKey,
+	)
 	
 	// Authenticator
 	jwtAuthenticator := auth.NewJWTAuthenticator(
