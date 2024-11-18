@@ -18,11 +18,12 @@ type Encoder interface {
 type VideoEncoder struct{}
 
 // Takes a video object and a base file name and encodes to mp4
+// 将视频编码为 MP4 格式
 func (ve *VideoEncoder) EncodeToMP4(v *Video, baseFileName string) error {
 	// Create transcoder
 	trans := new(transcoder.Transcoder)
 
-	// Build the output path
+	// 构建输出路径
 	outputPath := fmt.Sprintf("%s/%s.mp4", v.OutputDir, baseFileName)
 
 	// Initialize the transcoder

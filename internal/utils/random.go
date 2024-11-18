@@ -7,6 +7,10 @@ import (
 	"time"
 )
 
+
+// 1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
+
+
 const alphabet = "abcdefghijklmnopqrstuvwxyz"
 
 var r *rand.Rand

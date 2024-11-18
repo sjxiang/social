@@ -18,7 +18,6 @@ import (
 	"github.com/sjxiang/social/internal/mailer"
 	"github.com/sjxiang/social/internal/ratelimiter"
 	"github.com/sjxiang/social/internal/store"
-	"github.com/sjxiang/social/internal/streamer"
 	"github.com/sjxiang/social/internal/token"
 )
 
@@ -31,7 +30,6 @@ type application struct {
 	mailer        mailer.EmailSender
 	auth          auth.Authenticator
 	tokenMaker    token.Maker
-	videoQueue    chan streamer.VideoProcessingJob
 }
 
 

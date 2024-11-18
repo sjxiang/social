@@ -5,7 +5,6 @@ import (
 	"github.com/sjxiang/social/internal/logger"
 	"github.com/sjxiang/social/internal/mailer"
 	"github.com/sjxiang/social/internal/ratelimiter"
-	"github.com/sjxiang/social/internal/streamer"
 	"github.com/sjxiang/social/internal/token"
 	"github.com/sjxiang/social/internal/utils"
 )
@@ -66,14 +65,6 @@ func main() {
 		cfg.auth.jwt.secretKey, 
 		cfg.auth.jwt.issuer,
 	)
-
-	const numWorkers = 4
-	videoQueue := make(chan streamer.VideoProcessingJob, numWorkers)
-	defer close(videoQueue)
-
-	wp := streamer.New(videoQueue, numWorkers)
-	wp.Run()
-
 	
 	// app
 	app := &application{
@@ -83,7 +74,6 @@ func main() {
 		tokenMaker:    tokenMaker,
 		auth:          jwtAuthenticator,
 		rateLimiter:   fixedWindowLimiter,
-		videoQueue:    videoQueue,
 	}
 
 	mux := app.mount()

@@ -2,3 +2,5 @@
 # 过滤
 .env
 *.log
+
+/scripts/input/**/*.mp4
