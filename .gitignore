@@ -4,3 +4,4 @@
 *.log
 
 /scripts/input/**/*.mp4
+/scripts/output/**/*.mp4
