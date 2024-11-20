@@ -47,6 +47,7 @@ type VideoOptions struct {
 	MaxRate480p     string
 }
 
+
 func (vd *VideoDispatcher) NewVideo(id int, input string, output string, encType string, notifyChan chan ProcessingMessage, options *VideoOptions) Video {
 	if options == nil {
 		options = &VideoOptions{}

@@ -29,7 +29,7 @@ type Storage struct {
 
 	PostStore interface {
 		GetOne(ctx context.Context, postID int64) (*Post, error)
-		Create(ctx context.Context, params Post) error
+		Create(ctx context.Context, params *Post) error
 		Delete(ctx context.Context, postID int64) error
 		Update(ctx context.Context, params Post) error
 		GetUserFeed(ctx context.Context, userID int64, fq PaginatedFeedQuery) ([]PostWithMetadata, error)

@@ -75,10 +75,11 @@ func (p *PostStoreImpl)	GetOne(ctx context.Context, postID int64) (*Post, error)
 }
 
 
-func (p *PostStoreImpl) Create(ctx context.Context, params Post) error {
+// UTC_TIMESTAMP() - 当前时间 
+func (p *PostStoreImpl) Create(ctx context.Context, params *Post) error {
 	stmt := `
 		insert into posts (content, title, user_id, tags, created_at, updated_at, version)
-		values (?, ?, ?, ?, ?, ?, ?)
+		values (?, ?, ?, ?, utc_timestamp(), utc_timestamp(), 1)
 	`
 
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
@@ -92,10 +93,8 @@ func (p *PostStoreImpl) Create(ctx context.Context, params Post) error {
 		params.Title,
 		params.UserID, 
 		tags,
-		params.CreatedAt, 
-		params.UpdatedAt, 
-		params.Version,
 	)
+	
 	return err
 }
 

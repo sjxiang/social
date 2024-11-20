@@ -7,6 +7,10 @@ import (
 )
 
 func main() {
+
+	// ffmpeg -i input_video.mp4 -ss 0:0:5 -vframes 1 -q:v 2 output_cover.jpg
+
+	// ffmpeg -i example.mp4 -ss 0:0:5 -vframes 1 -q:v 2 output_cover.jpg
 	// Define number of workers and jobs
 	const numJobs = 4
 	const numWorkers = 4

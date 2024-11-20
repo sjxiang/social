@@ -8,13 +8,12 @@ import (
 	"github.com/xfrr/goffmpeg/transcoder"
 )
 
-// Encoder is an interface for encoding video, any type that wants to satisfy this interface must implement all its methods
+// Encoder 视频编码的接口
 type Encoder interface {
 	EncodeToMP4(v *Video, baseFileName string) error
 	EncodeToHLS(v *Video, baseFileName string) error
 }
 
-// VideoEncoder is a type which satisfies the Encoder interface because it implements all the methods specified in Encoder
 type VideoEncoder struct{}
 
 // Takes a video object and a base file name and encodes to mp4
@@ -93,6 +92,9 @@ func (vd *VideoEncoder) EncodeToHLS(v *Video, baseFileName string) error {
 			fmt.Sprintf("%s/%s-%%v.m3u8", v.OutputDir, baseFileName),
 		)
 
+		// ffmpeg -i input.mp4 -c:v libx264 -c:a aac -strict -2 -f hls -hls_time 10 -hls_list_size 0 output.m3u8
+		// ffmpeg -i example.mp4 -c:v libx264 -c:a aac -strict -2 -f hls -hls_time 10 -hls_list_size 0 output.m3u8
+		
 		_, err := ffmpegCmd.CombinedOutput()
 		result <- err
 	}(result)
